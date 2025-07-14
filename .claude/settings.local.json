@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash:*",
+      "Read:*",
+      "Write:*",
+      "Edit:*",
+      "MultiEdit:*",
+      "Glob:*",
+      "Grep:*",
+      "LS:*",
+      "Task:*",
+      "WebFetch:*",
+      "WebSearch:*",
+      "TodoWrite:*",
+      "NotebookRead:*",
+      "NotebookEdit:*",
+      "Bash(open:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}
