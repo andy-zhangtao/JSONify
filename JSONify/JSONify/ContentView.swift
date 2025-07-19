@@ -9,8 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var jsonProcessor = JSONProcessor()
+    @StateObject private var historyManager = SessionHistoryManager()
     @State private var showingCopyAlert = false
     @State private var viewMode: ViewMode = .formatted
+    @State private var saveTimer: Timer?
     @AppStorage("sortKeys") private var sortKeys = true
     @AppStorage("fontSize") private var fontSize = 14.0
     @AppStorage("autoFormat") private var autoFormat = true
@@ -38,9 +40,19 @@ struct ContentView: View {
                                     .stroke(jsonProcessor.isValid ? Color.green : (jsonProcessor.validationError != nil ? Color.red : Color.gray), lineWidth: 2)
                             )
                             .cornerRadius(8)
-                            .onChange(of: jsonProcessor.inputText) { _ in
+                            .onChange(of: jsonProcessor.inputText) { newValue in
                                 if autoFormat {
                                     jsonProcessor.processJSON(sortKeys: sortKeys)
+                                }
+                                
+                                // 取消之前的定时器
+                                saveTimer?.invalidate()
+                                
+                                // 设置新的定时器，延迟1.5秒后保存
+                                if jsonProcessor.isValid && !newValue.isEmpty {
+                                    saveTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
+                                        historyManager.addSession(newValue)
+                                    }
                                 }
                             }
                             .font(.system(size: fontSize, design: .monospaced))
@@ -194,6 +206,14 @@ struct ContentView: View {
                 }
                 .padding()
                 .frame(minWidth: 400)
+                
+                // 会话历史视图
+                SessionHistoryView(
+                    historyManager: historyManager,
+                    selectedContent: $jsonProcessor.inputText
+                )
+                .frame(width: 300)
+                .padding(.trailing)
             }
             .overlay(
                 VStack {
