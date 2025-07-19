@@ -23,6 +23,12 @@ struct MainTabView: View {
                     Label("比较", systemImage: "doc.on.doc")
                 }
                 .tag(1)
+            
+            JSONPathQueryView()
+                .tabItem {
+                    Label("查询", systemImage: "magnifyingglass")
+                }
+                .tag(2)
         }
         .frame(minWidth: 1400, minHeight: 800)
     }
