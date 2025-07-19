@@ -27,7 +27,7 @@ struct JSONifyApp: App {
                 .keyboardShortcut("k", modifiers: .command)
             }
             
-            CommandGroup(after: .editMenu) {
+            CommandGroup(after: .pasteboard) {
                 Button("复制格式化结果") {
                     NotificationCenter.default.post(name: .copyFormatted, object: nil)
                 }
@@ -39,7 +39,7 @@ struct JSONifyApp: App {
                 .keyboardShortcut("v", modifiers: [.command, .shift])
             }
             
-            CommandGroup(after: .viewMenu) {
+            CommandGroup(after: .toolbar) {
                 Button("切换视图模式") {
                     NotificationCenter.default.post(name: .toggleViewMode, object: nil)
                 }

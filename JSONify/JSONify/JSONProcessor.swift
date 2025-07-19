@@ -1,7 +1,6 @@
 import Foundation
-import JSONHealer
 
-enum JSONValidationError: Error {
+enum JSONValidationError: Error, Equatable {
     case invalidJSON(message: String, line: Int?, column: Int?)
     case emptyInput
     
@@ -26,7 +25,7 @@ class JSONProcessor: ObservableObject {
     @Published var isValid: Bool = false
     @Published var processingTime: TimeInterval?
     
-    private let jsonHealer = JSONHealer()
+    // TODO: 将来可以添加JSONHealer支持
     private var debounceTimer: Timer?
     
     deinit {
@@ -66,12 +65,13 @@ class JSONProcessor: ObservableObject {
         }
         
         do {
-            let healedJSON = try jsonHealer.heal(jsonString: inputText)
-            
-            guard let data = healedJSON.data(using: .utf8) else {
-                validationError = .invalidJSON(message: "无法解析输入", line: nil, column: nil)
-                isValid = false
-                formattedJSON = ""
+            // 先尝试直接解析JSON
+            guard let data = inputText.data(using: String.Encoding.utf8) else {
+                DispatchQueue.main.async {
+                    self.validationError = .invalidJSON(message: "无法解析输入", line: nil, column: nil)
+                    self.isValid = false
+                    self.formattedJSON = ""
+                }
                 return
             }
             
@@ -118,13 +118,12 @@ class JSONProcessor: ObservableObject {
             var line: Int?
             var column: Int?
             
-            if let userInfo = nsError.userInfo as? [String: Any] {
-                if let lineNumber = userInfo["NSJSONReadingErrorLineNumber"] as? Int {
-                    line = lineNumber
-                }
-                if let columnNumber = userInfo["NSJSONReadingErrorColumnNumber"] as? Int {
-                    column = columnNumber
-                }
+            let userInfo = nsError.userInfo
+            if let lineNumber = userInfo["NSJSONReadingErrorLineNumber"] as? Int {
+                line = lineNumber
+            }
+            if let columnNumber = userInfo["NSJSONReadingErrorColumnNumber"] as? Int {
+                column = columnNumber
             }
             
             var message = "JSON 格式错误"
