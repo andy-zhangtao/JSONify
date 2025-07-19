@@ -11,10 +11,10 @@ import SwiftUI
 struct JSONifyApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
         .windowStyle(.titleBar)
-        .windowResizability(.contentSize)
+        .windowResizability(.automatic)
         
         Settings {
             SettingsView()

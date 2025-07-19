@@ -10,12 +10,13 @@ import SwiftUI
 
 // 会话历史数据模型
 struct JSONSession: Identifiable, Codable, Equatable {
-    let id = UUID()
+    let id: UUID
     let content: String
     let timestamp: Date
     let preview: String
     
     init(content: String, timestamp: Date = Date()) {
+        self.id = UUID()
         self.content = content
         self.timestamp = timestamp
         
