@@ -1,0 +1,27 @@
+version: "Apple Swift version 6.1.2 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)"
+options: "394cfeba82405fcbf405c15c3d9192435969e7b628935f0a21d2d461a964994a"
+build_start_time: [1752939379, 183317000]
+build_end_time: [1752939389, 114178000]
+inputs:
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/ContentView.swift": [1752930229, 888240105]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/DiffResultView.swift": [1752934524, 900105009]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONCompareView.swift": [1752935131, 608179864]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONDiffEngine.swift": [1752933241, 389518759]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONPathEngine.swift": [1752938188, 894496459]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONPathQueryView.swift": [1752938292, 264562922]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONProcessor.swift": [1752924700, 708252399]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONTreeView.swift": [1752502499, 17586037]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONifyApp.swift": [1752933930, 615161038]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/MainTabView.swift": [1752938346, 514575695]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/Persistence.swift": [1752500823, 955636779]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/SessionHistory.swift": [1752935426, 111703713]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/SettingsView.swift": [1752502592, 651572836]
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/StatusBarView.swift": [1752502974, 545220240]
+  ? "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONify.build/Release/JSONify.build/DerivedSources/CoreDataGenerated/JSONify/Item+CoreDataClass.swift"
+  : [1752939378, 505656102]
+  ? "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONify.build/Release/JSONify.build/DerivedSources/CoreDataGenerated/JSONify/Item+CoreDataProperties.swift"
+  : [1752939378, 506088477]
+  ? "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONify.build/Release/JSONify.build/DerivedSources/CoreDataGenerated/JSONify/JSONify+CoreDataModel.swift"
+  : [1752939378, 504270520]
+  ? "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONify.build/Release/JSONify.build/DerivedSources/GeneratedAssetSymbols.swift"
+  : [1752939379, 176890466]

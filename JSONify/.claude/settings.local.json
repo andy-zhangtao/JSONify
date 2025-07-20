@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod:*)",
+      "Bash(./release.sh)",
+      "Bash(ls:*)",
+      "Bash(git push:*)",
+      "Bash(md5:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(grep:*)",
+      "Bash(awk:*)",
+      "Bash(swift:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(git add:*)",
+      "Bash(git tag:*)",
+      "Bash(./build_release.sh:*)"
+    ],
+    "deny": []
+  }
+}

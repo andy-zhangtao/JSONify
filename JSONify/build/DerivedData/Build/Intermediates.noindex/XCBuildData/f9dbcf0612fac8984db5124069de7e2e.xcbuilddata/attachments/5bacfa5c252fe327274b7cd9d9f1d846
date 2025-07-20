@@ -1,0 +1,35 @@
+{
+  "" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer-master.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer-master.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer-master.dia",
+    "emit-module-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer-master.swiftdeps"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONHealer/Sources/JSONHealer/JSONDiagnostic.swift" : {
+    "index-unit-output-path" : "/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONDiagnostic.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONDiagnostic.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONDiagnostic.o"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONHealer/Sources/JSONHealer/JSONError.swift" : {
+    "index-unit-output-path" : "/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONError.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONError.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONError.o"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONHealer/Sources/JSONHealer/JSONHealer+Convenience.swift" : {
+    "index-unit-output-path" : "/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer+Convenience.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer+Convenience.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer+Convenience.o"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONHealer/Sources/JSONHealer/JSONHealer.swift" : {
+    "index-unit-output-path" : "/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONHealer.o"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONHealer/Sources/JSONHealer/JSONParser.swift" : {
+    "index-unit-output-path" : "/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONParser.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONParser.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DerivedData/Build/Intermediates.noindex/JSONHealer.build/Release/JSONHealer.build/Objects-normal/arm64/JSONParser.o"
+  }
+}

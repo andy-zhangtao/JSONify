@@ -16,7 +16,22 @@
       "NotebookRead:*",
       "NotebookEdit:*",
       "Bash(open:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(hdiutil create:*)",
+      "Bash(hdiutil imageinfo:*)",
+      "Bash(rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(gh release create:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh release view:*)"
     ],
     "deny": []
   }
