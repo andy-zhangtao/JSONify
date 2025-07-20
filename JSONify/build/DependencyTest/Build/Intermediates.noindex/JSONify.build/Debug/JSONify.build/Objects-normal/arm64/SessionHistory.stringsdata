@@ -1,0 +1,40 @@
+{
+  "source": "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/SessionHistory.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "会话历史",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "清除全部",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "暂无会话历史",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 129
+        }
+      },
+      {
+        "comment": "",
+        "key": "输入的JSON将自动保存到这里",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 131
+        }
+      }
+    ]
+  },
+  "version": 1
+}
