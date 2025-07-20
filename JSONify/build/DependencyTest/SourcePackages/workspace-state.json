@@ -1,0 +1,27 @@
+{
+  "object" : {
+    "artifacts" : [
+
+    ],
+    "dependencies" : [
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "jsonhealer",
+          "kind" : "fileSystem",
+          "location" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONHealer",
+          "name" : "JSONHealer"
+        },
+        "state" : {
+          "name" : "fileSystem",
+          "path" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONHealer"
+        },
+        "subpath" : "jsonhealer"
+      }
+    ],
+    "prebuilts" : [
+
+    ]
+  },
+  "version" : 7
+}

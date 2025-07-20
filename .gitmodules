@@ -1,0 +1,3 @@
+[submodule "JSONify/JSONHealer"]
+	path = JSONify/JSONHealer
+	url = https://github.com/andy-zhangtao/JSONHealer.git

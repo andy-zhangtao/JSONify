@@ -1,0 +1,188 @@
+{
+  "" : {
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify-master.dia",
+    "emit-module-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify-master.swiftdeps"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/ContentView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/DiffResultView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/DiffResultView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONCompareView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONCompareView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONDiffEngine.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONDiffEngine~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONPathEngine.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathEngine~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONPathQueryView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONPathQueryView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONProcessor.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONProcessor~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONTreeView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONTreeView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/JSONifyApp.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONifyApp~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/MainTabView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/MainTabView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/Persistence.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Persistence~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/SessionHistory.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SessionHistory~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/SettingsView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/JSONify/StatusBarView.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/StatusBarView~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/DerivedSources/CoreDataGenerated/JSONify/Item+CoreDataClass.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/DerivedSources/CoreDataGenerated/JSONify/Item+CoreDataProperties.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/Item+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/DerivedSources/CoreDataGenerated/JSONify/JSONify+CoreDataModel.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/JSONify+CoreDataModel~partial.swiftmodule"
+  },
+  "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/zhangtao/Sourcecode/github/JSONify/JSONify/build/DependencyTest/Build/Intermediates.noindex/JSONify.build/Debug/JSONify.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}
