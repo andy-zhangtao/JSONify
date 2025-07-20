@@ -202,7 +202,7 @@
 			mainGroup = 49FC808C2E2541D60047B8CA;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				49FC80D72E2546EE0047B8CA /* XCLocalSwiftPackageReference "../../JSONHealer" */,
+				49FC80D72E2546EE0047B8CA /* XCLocalSwiftPackageReference "./JSONHealer" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 49FC80962E2541D60047B8CA /* Products */;
@@ -562,9 +562,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		49FC80D72E2546EE0047B8CA /* XCLocalSwiftPackageReference "../../JSONHealer" */ = {
+		49FC80D72E2546EE0047B8CA /* XCLocalSwiftPackageReference "./JSONHealer" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../JSONHealer;
+			relativePath = ./JSONHealer;
 		};
 /* End XCLocalSwiftPackageReference section */
 
