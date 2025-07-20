@@ -15,6 +15,7 @@ struct JSONCompareView: View {
     @State private var compareOptions = CompareOptions()
     @State private var showingOptions = false
     @AppStorage("compareFontSize") private var fontSize = 14.0
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
         VStack(spacing: 0) {

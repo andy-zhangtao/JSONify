@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var showingCopyAlert = false
     @State private var viewMode: ViewMode = .formatted
     @State private var saveTimer: Timer?
+    @EnvironmentObject private var themeManager: ThemeManager
     @AppStorage("sortKeys") private var sortKeys = true
     @AppStorage("fontSize") private var fontSize = 14.0
     @AppStorage("autoFormat") private var autoFormat = true
@@ -32,9 +33,10 @@ struct ContentView: View {
                     
                     ZStack(alignment: .topLeading) {
                         TextEditor(text: $jsonProcessor.inputText)
-                            .font(.system(.body, design: .monospaced))
-                            .padding(8)
-                            .background(Color(NSColor.textBackgroundColor))
+                            .themeAwareMonospacedFont(size: fontSize * themeManager.uiDensity.fontSizeMultiplier)
+                            .themeAwarePadding(.all, 8)
+                            .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor))
+                            .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(jsonProcessor.isValid ? Color.green : (jsonProcessor.validationError != nil ? Color.red : Color.gray), lineWidth: 2)
@@ -55,14 +57,13 @@ struct ContentView: View {
                                     }
                                 }
                             }
-                            .font(.system(size: fontSize, design: .monospaced))
                         
                         if jsonProcessor.inputText.isEmpty {
                             Text("在此粘贴或输入您的 JSON 数据...")
                                 .foregroundColor(.secondary)
-                                .font(.system(.body, design: .monospaced))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 16)
+                                .themeAwareMonospacedFont(size: fontSize)
+                                .themeAwarePadding(.horizontal, 12)
+                                .themeAwarePadding(.vertical, 16)
                                 .allowsHitTesting(false)
                         }
                     }
@@ -152,31 +153,38 @@ struct ContentView: View {
                             switch viewMode {
                             case .formatted:
                                 ScrollView {
-                                    HStack {
-                                        Text(jsonProcessor.formattedJSON)
-                                            .font(.system(size: fontSize, design: .monospaced))
-                                            .foregroundColor(.primary)
-                                            .textSelection(.enabled)
-                                            .frame(maxWidth: .infinity, alignment: .topLeading)
-                                        Spacer()
+                                    if themeManager.useCustomColors {
+                                        NewSyntaxHighlightedTextView(
+                                            text: .constant(jsonProcessor.formattedJSON),
+                                            fontSize: CGFloat(fontSize),
+                                            isEditable: false
+                                        )
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                        .padding()
+                                    } else {
+                                        TextEditor(text: .constant(jsonProcessor.formattedJSON))
+                                            .themeAwareMonospacedFont(size: fontSize * themeManager.uiDensity.fontSizeMultiplier)
+                                            .themeAwarePadding(.all, 8)
+                                            .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor))
+                                            .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor))
+                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     }
-                                    .padding()
                                 }
-                                .background(Color(NSColor.controlBackgroundColor))
+                                .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor))
                                 .cornerRadius(8)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                        .stroke(Color(hex: themeManager.currentSyntaxColors.bracketColor)?.opacity(0.3) ?? Color.gray.opacity(0.3), lineWidth: 1)
                                 )
                                 .transition(.asymmetric(insertion: .opacity.combined(with: .slide), 
                                                        removal: .opacity.combined(with: .slide)))
                             case .tree:
                                 JSONTreeView(jsonString: jsonProcessor.formattedJSON)
-                                    .background(Color(NSColor.controlBackgroundColor))
+                                    .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor))
                                     .cornerRadius(8)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                            .stroke(Color(hex: themeManager.currentSyntaxColors.bracketColor)?.opacity(0.3) ?? Color.gray.opacity(0.3), lineWidth: 1)
                                     )
                                     .transition(.asymmetric(insertion: .opacity.combined(with: .slide), 
                                                            removal: .opacity.combined(with: .slide)))

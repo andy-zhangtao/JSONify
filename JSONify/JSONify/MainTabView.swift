@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab = 0
+    @StateObject private var themeManager = ThemeManager()
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -26,11 +27,27 @@ struct MainTabView: View {
             
             JSONPathQueryView()
                 .tabItem {
-                    Label("查询", systemImage: "magnifyingglass")
+                    Label("查找", systemImage: "magnifyingglass")
                 }
                 .tag(2)
+            
+            NewThemeSettingsView()
+                .tabItem {
+                    Label("主题", systemImage: "paintbrush.fill")
+                }
+                .tag(3)
         }
         .frame(minWidth: 1400, minHeight: 800)
+        .environmentObject(themeManager)
+        .environment(\.colorScheme, themeManager.effectiveColorScheme)
+        .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor))
+        .preferredColorScheme(themeManager.effectiveColorScheme)
+        .onChange(of: themeManager.currentTheme) { _ in
+            themeManager.applyThemeToApp()
+        }
+        .onAppear {
+            themeManager.applyThemeToApp()
+        }
     }
 }
 
