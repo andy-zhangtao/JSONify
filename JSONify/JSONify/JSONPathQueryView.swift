@@ -73,10 +73,10 @@ struct JSONPathQueryView: View {
                                     .background(Color(NSColor.textBackgroundColor))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(borderColor, lineWidth: 1.5)
+                                            .stroke(.gray, lineWidth: 1.5)
                                     )
                                     .cornerRadius(8)
-                                    .onChange(of: jsonProcessor.inputText) { _ in
+                                    .onChange(of: jsonProcessor.inputText) { _, _ in
                                         jsonProcessor.processJSON(sortKeys: false)
                                     }
                                 
@@ -148,8 +148,6 @@ struct JSONPathQueryView: View {
                         
                         Spacer()
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
                     .frame(width: geometry.size.width * 0.5)
                     
                     Rectangle()
@@ -207,10 +205,14 @@ struct JSONPathQueryView: View {
                             ScrollView {
                                 LazyVStack(alignment: .leading, spacing: 8) {
                                     ForEach(pathEngine.results) { result in
-                                        JSONPathResultRow(
+                                        EnhancedJSONPathResultRow(
                                             result: result,
                                             isSelected: selectedResult?.id == result.id,
-                                            onSelect: { selectedResult = result }
+                                            onSelect: { 
+                                                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                                    selectedResult = result
+                                                }
+                                            }
                                         )
                                     }
                                 }
@@ -218,8 +220,6 @@ struct JSONPathQueryView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
                     .frame(width: geometry.size.width * 0.5)
                 }
                 .background(Color(NSColor.windowBackgroundColor))
@@ -227,12 +227,6 @@ struct JSONPathQueryView: View {
         }
     }
     
-    private var borderColor: Color {
-        if !jsonProcessor.inputText.isEmpty {
-            return jsonProcessor.isValid ? Color.green : Color.red
-        }
-        return Color.gray
-    }
     
     private func performQuery() {
         guard jsonProcessor.isValid && !pathQuery.isEmpty else { return }
@@ -240,76 +234,126 @@ struct JSONPathQueryView: View {
     }
 }
 
-// 查询结果行
-struct JSONPathResultRow: View {
+// 增强的查询结果行
+struct EnhancedJSONPathResultRow: View {
     let result: JSONPathResult
     let isSelected: Bool
     let onSelect: () -> Void
     
     @State private var isExpanded = false
+    @State private var isHovered = false
+    @State private var showCopyAlert = false
+    @StateObject private var animationManager = AnimationManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             // 路径和值摘要
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(result.path)
-                        .font(.system(.caption, design: .monospaced))
-                        .fontWeight(.medium)
-                        .foregroundColor(.blue)
-                    
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    // 路径
                     HStack {
+                        Image(systemName: "location")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                        
+                        Text(result.path)
+                            .font(.system(.caption, design: .monospaced))
+                            .fontWeight(.medium)
+                            .foregroundColor(.blue)
+                            .textSelection(.enabled)
+                    }
+                    
+                    // 值
+                    HStack {
+                        Image(systemName: valueIcon)
+                            .font(.caption)
+                            .foregroundColor(valueColor)
+                        
                         Text(result.formattedValue)
                             .font(.system(.caption, design: .monospaced))
-                            .lineLimit(1)
+                            .lineLimit(isExpanded ? nil : 1)
                             .foregroundColor(.primary)
+                            .textSelection(.enabled)
                         
                         Spacer()
-                        
-                        if canExpand {
-                            Button(action: { isExpanded.toggle() }) {
-                                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                                    .font(.caption)
-                            }
-                            .buttonStyle(.borderless)
-                        }
                     }
                 }
                 
-                Button(action: copyPath) {
-                    Image(systemName: "doc.on.doc")
-                        .font(.caption)
+                // 操作按钮
+                HStack(spacing: 8) {
+                    if canExpand {
+                        Button(action: {
+                            withAnimation(animationManager.spring) {
+                                isExpanded.toggle()
+                            }
+                        }) {
+                            Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                                .font(.body)
+                                .foregroundColor(.blue)
+                        }
+                        .buttonStyle(.plain)
+                        .animatedScale(trigger: isExpanded)
+                    }
+                    
+                    Button(action: copyPath) {
+                        Image(systemName: "doc.on.doc.fill")
+                            .font(.body)
+                            .foregroundColor(.green)
+                    }
+                    .buttonStyle(.plain)
+                    .help("复制路径")
+                    .animatedScale(trigger: isHovered)
                 }
-                .buttonStyle(.borderless)
-                .help("复制路径")
             }
             
             // 展开的详细内容
             if isExpanded, let detailedJSON = JSONPathEngine.getDetailedJSON(result.value) {
-                ScrollView(.horizontal, showsIndicators: true) {
-                    Text(detailedJSON)
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundColor(.primary)
-                        .textSelection(.enabled)
-                        .padding(8)
-                        .background(Color(NSColor.textBackgroundColor))
-                        .cornerRadius(4)
+                EnhancedCard {
+                    ScrollView(.horizontal, showsIndicators: true) {
+                        Text(detailedJSON)
+                            .themeAwareMonospacedFont(size: 12 * themeManager.uiDensity.fontSizeMultiplier)
+                            .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor))
+                            .textSelection(.enabled)
+                            .padding(8)
+                    }
+                    .frame(maxHeight: 200)
                 }
-                .frame(maxHeight: 200)
+                .pageTransition(isActive: isExpanded)
             }
         }
         .padding(12)
         .background(
-            RoundedRectangle(cornerRadius: 6)
-                .fill(isSelected ? Color.accentColor.opacity(0.1) : Color.clear)
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(hex: themeManager.currentSyntaxColors.backgroundColor) ?? .clear)
+                .shadow(
+                    color: Color.black.opacity(themeManager.effectiveColorScheme == .dark ? 0.3 : 0.1),
+                    radius: isSelected ? 6 : 2,
+                    x: 0,
+                    y: isSelected ? 2 : 1
+                )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(
+                    isSelected ? Color.blue : (isHovered ? Color.blue.opacity(0.5) : Color.gray.opacity(0.2)),
+                    lineWidth: isSelected ? 2 : 1
+                )
         )
+        .scaleEffect(isSelected ? 1.02 : (isHovered ? 1.01 : 1.0))
+        .onHover { hovering in
+            withAnimation(animationManager.spring) {
+                isHovered = hovering
+            }
+        }
         .contentShape(Rectangle())
         .onTapGesture {
             onSelect()
+        }
+        .alert("已复制", isPresented: $showCopyAlert) {
+            Button("确定", role: .cancel) { }
+        } message: {
+            Text("路径已复制到剪贴板")
         }
     }
     
@@ -317,44 +361,130 @@ struct JSONPathResultRow: View {
         result.value is [Any] || result.value is [String: Any]
     }
     
+    private var valueIcon: String {
+        if result.value is String {
+            return "textformat"
+        } else if result.value is NSNumber {
+            return "number"
+        } else if result.value is [Any] {
+            return "list.bullet"
+        } else if result.value is [String: Any] {
+            return "curlybraces"
+        } else {
+            return "questionmark"
+        }
+    }
+    
+    private var valueColor: Color {
+        if result.value is String {
+            return .green
+        } else if result.value is NSNumber {
+            return .orange
+        } else if result.value is [Any] {
+            return .purple
+        } else if result.value is [String: Any] {
+            return .blue
+        } else {
+            return .gray
+        }
+    }
+    
     private func copyPath() {
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.setString(result.path, forType: .string)
+        
+        withAnimation(animationManager.bouncy) {
+            showCopyAlert = true
+        }
     }
 }
 
 // JSONPath语法帮助视图
 struct JSONPathHelpView: View {
+    @StateObject private var animationManager = AnimationManager.shared
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("JSONPath 语法帮助")
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 20) {
+            // 标题区域
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: "questionmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.blue)
+                    
+                    Text("JSONPath 语法帮助")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                }
+                
+                Text("学习如何使用JSONPath查询表达式")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            }
+            .pageTransition(isActive: true)
             
+            // 语法示例
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(JSONPathExample.examples, id: \.syntax) { example in
-                        HStack(alignment: .top, spacing: 16) {
-                            Text(example.syntax)
-                                .font(.system(.caption, design: .monospaced))
-                                .foregroundColor(.blue)
-                                .frame(width: 150, alignment: .leading)
-                            
-                            Text(example.description)
-                                .font(.caption)
-                                .foregroundColor(.primary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                        EnhancedCard {
+                            HStack(alignment: .top, spacing: 16) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(example.syntax)
+                                        .font(.system(.body, design: .monospaced))
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.blue)
+                                        .textSelection(.enabled)
+                                    
+                                    Text(example.description)
+                                        .font(.body)
+                                        .foregroundColor(.primary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                
+                                Spacer()
+                                
+                                Button(action: {
+                                    // 复制示例到剪贴板
+                                    let pasteboard = NSPasteboard.general
+                                    pasteboard.declareTypes([.string], owner: nil)
+                                    pasteboard.setString(example.syntax, forType: .string)
+                                }) {
+                                    Image(systemName: "doc.on.doc")
+                                        .font(.caption)
+                                }
+                                .buttonStyle(.plain)
+                                .help("复制示例")
+                            }
                         }
-                        .padding(.vertical, 4)
-                        
-                        Divider()
+                        .pageTransition(isActive: true)
                     }
                 }
             }
             
-            Text("提示：点击查询结果可以查看详细内容")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            // 提示信息
+            EnhancedCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "lightbulb.fill")
+                            .foregroundColor(.yellow)
+                        Text("使用技巧")
+                            .font(.headline)
+                            .fontWeight(.medium)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("• 点击查询结果可以查看详细内容")
+                        Text("• 使用快速示例快速开始")
+                        Text("• 支持复杂的嵌套查询")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+            }
+            .pageTransition(isActive: true)
         }
         .padding()
     }

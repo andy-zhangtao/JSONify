@@ -324,6 +324,7 @@ extension Color {
     }
 }
 
+
 #Preview {
     NewThemeSettingsView()
         .environmentObject(ThemeManager())
