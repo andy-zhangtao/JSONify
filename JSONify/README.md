@@ -1,5 +1,4 @@
 # JSONify
-专为 macOS 设计的简洁高效 JSON 验证和格式化工具
 
 <div align="center">
 
@@ -173,10 +172,12 @@ open JSONify.xcodeproj
 
 ### 主界面 - Tab 导航
 <div align="center">
-  <img src="Screenshots/main.png" alt="主界面" width="800">
-</div>
-<div align="center">
   <img src="Screenshots/main-interface.png" alt="主界面" width="800">
+</div>
+
+### JSON 格式化
+<div align="center">
+  <img src="Screenshots/json-formatter.png" alt="JSON格式化" width="800">
 </div>
 
 ### JSON 比较
