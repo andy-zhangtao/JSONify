@@ -153,16 +153,29 @@ extension ContentView {
     
     private var manualFormatButtonView: some View {
         Group {
-            if !autoFormat && !jsonProcessor.inputText.isEmpty {
-                Button(action: performManualFormat) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "play.fill")
-                        Text("格式化 JSON")
+            if !jsonProcessor.inputText.isEmpty {
+                HStack(spacing: 12) {
+                    if !autoFormat {
+                        Button(action: performManualFormat) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "play.fill")
+                                Text("格式化 JSON")
+                            }
+                        }
+                        .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                        .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
                     }
+                    
+                    Button(action: performUnescape) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.up.left.and.down.right.and.arrow.up.right.and.down.left")
+                            Text("反转义")
+                        }
+                    }
+                    .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                    .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
                 }
-                .buttonStyle(EnhancedButtonStyle(variant: .primary))
-                .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
-                .pageTransition(isActive: !autoFormat)
+                .pageTransition(isActive: !jsonProcessor.inputText.isEmpty)
             }
         }
     }
@@ -385,6 +398,20 @@ extension ContentView {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             jsonProcessor.processJSON(sortKeys: sortKeys)
+            withAnimation(animationManager.spring) {
+                isProcessing = false
+                showSuccessIndicator = true
+            }
+        }
+    }
+    
+    private func performUnescape() {
+        withAnimation(animationManager.spring) {
+            isProcessing = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            jsonProcessor.unescapeJSONString()
             withAnimation(animationManager.spring) {
                 isProcessing = false
                 showSuccessIndicator = true

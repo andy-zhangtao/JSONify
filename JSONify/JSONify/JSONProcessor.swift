@@ -111,6 +111,53 @@ class JSONProcessor: ObservableObject {
         }
     }
     
+    func unescapeJSONString() {
+        let unescaped = unescapeString(inputText)
+        DispatchQueue.main.async {
+            self.inputText = unescaped
+        }
+    }
+    
+    private func unescapeString(_ input: String) -> String {
+        var result = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if result.hasPrefix("\"") && result.hasSuffix("\"") {
+            result = String(result.dropFirst().dropLast())
+        }
+        
+        result = result
+            .replacingOccurrences(of: "\\\"", with: "\"")
+            .replacingOccurrences(of: "\\\\", with: "\\")
+            .replacingOccurrences(of: "\\/", with: "/")
+            .replacingOccurrences(of: "\\b", with: "\u{0008}")
+            .replacingOccurrences(of: "\\f", with: "\u{000C}")
+            .replacingOccurrences(of: "\\n", with: "\n")
+            .replacingOccurrences(of: "\\r", with: "\r")
+            .replacingOccurrences(of: "\\t", with: "\t")
+        
+        let unicodePattern = "\\\\u([0-9a-fA-F]{4})"
+        if let regex = try? NSRegularExpression(pattern: unicodePattern, options: []) {
+            var processedResult = result
+            let range = NSRange(location: 0, length: result.count)
+            let matches = regex.matches(in: result, options: [], range: range)
+            
+            for match in matches.reversed() {
+                let hexRange = match.range(at: 1)
+                if let hexStringRange = Range(hexRange, in: result) {
+                    let hexString = String(result[hexStringRange])
+                    if let unicodeValue = UInt32(hexString, radix: 16),
+                       let unicodeScalar = UnicodeScalar(unicodeValue) {
+                        let fullMatchRange = Range(match.range, in: processedResult)!
+                        processedResult.replaceSubrange(fullMatchRange, with: String(Character(unicodeScalar)))
+                    }
+                }
+            }
+            result = processedResult
+        }
+        
+        return result
+    }
+    
     private func parseJSONError(error: Error) -> JSONValidationError {
         let errorString = error.localizedDescription
         
