@@ -119,43 +119,26 @@ class JSONProcessor: ObservableObject {
     }
     
     private func unescapeString(_ input: String) -> String {
-        var result = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        if result.hasPrefix("\"") && result.hasSuffix("\"") {
-            result = String(result.dropFirst().dropLast())
-        }
-        
-        result = result
-            .replacingOccurrences(of: "\\\"", with: "\"")
-            .replacingOccurrences(of: "\\\\", with: "\\")
-            .replacingOccurrences(of: "\\/", with: "/")
-            .replacingOccurrences(of: "\\b", with: "\u{0008}")
-            .replacingOccurrences(of: "\\f", with: "\u{000C}")
-            .replacingOccurrences(of: "\\n", with: "\n")
-            .replacingOccurrences(of: "\\r", with: "\r")
-            .replacingOccurrences(of: "\\t", with: "\t")
-        
-        let unicodePattern = "\\\\u([0-9a-fA-F]{4})"
-        if let regex = try? NSRegularExpression(pattern: unicodePattern, options: []) {
-            var processedResult = result
-            let range = NSRange(location: 0, length: result.count)
-            let matches = regex.matches(in: result, options: [], range: range)
-            
-            for match in matches.reversed() {
-                let hexRange = match.range(at: 1)
-                if let hexStringRange = Range(hexRange, in: result) {
-                    let hexString = String(result[hexStringRange])
-                    if let unicodeValue = UInt32(hexString, radix: 16),
-                       let unicodeScalar = UnicodeScalar(unicodeValue) {
-                        let fullMatchRange = Range(match.range, in: processedResult)!
-                        processedResult.replaceSubrange(fullMatchRange, with: String(Character(unicodeScalar)))
-                    }
+        // 尝试使用JSON反序列化来正确处理转义的JSON字符串
+        if let data = trimmed.data(using: .utf8) {
+            do {
+                // 尝试将输入作为JSON字符串解析，使用allowFragments选项
+                if let jsonString = try JSONSerialization.jsonObject(with: data, options: [.allowFragments]) as? String {
+                    return jsonString
                 }
+            } catch {
+                // 如果不是JSON字符串，继续尝试其他方法
             }
-            result = processedResult
         }
         
-        return result
+        // 如果JSON解析失败，返回原始输入（去掉外层引号）
+        if trimmed.hasPrefix("\"") && trimmed.hasSuffix("\"") {
+            return String(trimmed.dropFirst().dropLast())
+        }
+        
+        return trimmed
     }
     
     private func parseJSONError(error: Error) -> JSONValidationError {
