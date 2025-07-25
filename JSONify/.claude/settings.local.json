@@ -14,7 +14,22 @@
       "Bash(rm:*)",
       "Bash(git add:*)",
       "Bash(git tag:*)",
-      "Bash(./build_release.sh:*)"
+      "Bash(./build_release.sh:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(gh release create:*)",
+      "Bash(--title \"v1.7.0 - JSON字符串反转义功能\" )",
+      "Bash(--notes \"## 🎉 新功能\n\n### ✨ JSON字符串反转义\n- **新增反转义按钮**：在格式化页面添加了\"\"反转义\"\"按钮，与现有UI设计保持一致\n- **智能处理**：能够正确处理转义的JSON字符串输入\n- **标准兼容**：使用系统\\`JSONSerialization\\`确保输出始终是合法的JSON\n- **用户友好**：反转义后可直接进行格式化操作，工作流更加顺畅\n\n## 🔧 重要修复\n\n### 算法优化\n- **修复严重bug**：原反转义算法会破坏JSON内部结构，导致输出无效JSON\n- **使用标准解析器**：改用\\`JSONSerialization.jsonObject(options: [.allowFragments])\\`确保正确性\n- **简化实现**：移除复杂的手动转义处理，降低出错概率\n\n### 测试覆盖\n- **完整单元测试**：添加了全面的单元测试套件\n- **复杂场景验证**：测试Unicode转义、特殊字符、嵌套对象等场景\n- **用户案例验证**：确保用户提供的复杂测试用例能够正确处理\n\n## 🎨 用户体验\n\n### UI设计\n- **设计一致性**：反转义按钮使用\\`EnhancedButtonStyle(variant: .secondary)\\`保持风格统一\n- **布局优化**：按钮与\"\"格式化 JSON\"\"按钮水平排列，节省空间\n- **交互反馈**：包含处理动画和成功提示，提升用户体验\n\n### 使用场景\n- **转义JSON字符串**：如 \\`\"\"{\\\"\"name\\\"\":\\\"\"value\\\"\"}\"\"\\` → \\`{\"\"name\"\":\"\"value\"\"}\\`\n- **API响应处理**：处理从API返回的转义JSON字符串\n- **日志分析**：处理日志中的转义JSON数据\n\n## 📦 下载安装\n\n请下载下方的 **JSONify.dmg** 文件进行安装。\n\n## 🔗 相关链接\n\n- **功能演示分支**：[\\`feature/string-escape\\`](https://github.com/andy-zhangtao/JSONify/tree/feature/string-escape)\n- **技术文档**：详细的实现说明请查看提交记录\n\n---\n\n**感谢您使用 JSONify！** 如有问题或建议，欢迎提交 Issue。\" )",
+      "Bash(JSONify.dmg)",
+      "Bash(brew install:*)",
+      "Bash(gh auth:*)",
+      "Bash(--title \"v1.7.0 - JSON字符串反转义功能\" )",
+      "Bash(--notes-file RELEASE_NOTES_v1.7.0.md )",
+      "Bash(--title \"v1.7.0 - JSON字符串反转义功能\" )",
+      "Bash(--notes-file RELEASE_NOTES_v1.7.0.md )",
+      "Bash(git restore:*)",
+      "Bash(git reset:*)",
+      "Bash(git merge:*)"
     ],
     "deny": []
   }
