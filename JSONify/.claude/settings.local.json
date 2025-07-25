@@ -29,7 +29,8 @@
       "Bash(--notes-file RELEASE_NOTES_v1.7.0.md )",
       "Bash(git restore:*)",
       "Bash(git reset:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(git branch:*)"
     ],
     "deny": []
   }

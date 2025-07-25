@@ -154,26 +154,63 @@ extension ContentView {
     private var manualFormatButtonView: some View {
         Group {
             if !jsonProcessor.inputText.isEmpty {
-                HStack(spacing: 12) {
-                    if !autoFormat {
-                        Button(action: performManualFormat) {
+                VStack(spacing: 12) {
+                    // 第一行：主要功能按钮
+                    HStack(spacing: 12) {
+                        if !autoFormat {
+                            Button(action: performManualFormat) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "play.fill")
+                                    Text("格式化 JSON")
+                                }
+                            }
+                            .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                            .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
+                        }
+                        
+                        Button(action: performUnescape) {
                             HStack(spacing: 8) {
-                                Image(systemName: "play.fill")
-                                Text("格式化 JSON")
+                                Image(systemName: "arrow.up.left.and.down.right.and.arrow.up.right.and.down.left")
+                                Text("反转义")
                             }
                         }
-                        .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
                         .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
+                        
+                        Spacer()
                     }
                     
-                    Button(action: performUnescape) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "arrow.up.left.and.down.right.and.arrow.up.right.and.down.left")
-                            Text("反转义")
+                    // 第二行：编码转换功能按钮
+                    HStack(spacing: 8) {
+                        Button(action: performUnicodeConversion) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "textformat.123")
+                                Text("Unicode转中文")
+                            }
                         }
+                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        .animatedScale(trigger: !jsonProcessor.inputText.isEmpty, scale: 0.98)
+                        
+                        Button(action: performHTMLConversion) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "doc.richtext")
+                                Text("HTML转中文")
+                            }
+                        }
+                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        .animatedScale(trigger: !jsonProcessor.inputText.isEmpty, scale: 0.98)
+                        
+                        Button(action: performURLDecoding) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "link.badge.plus")
+                                Text("URL解码")
+                            }
+                        }
+                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        .animatedScale(trigger: !jsonProcessor.inputText.isEmpty, scale: 0.98)
+                        
+                        Spacer()
                     }
-                    .buttonStyle(EnhancedButtonStyle(variant: .secondary))
-                    .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
                 }
                 .pageTransition(isActive: !jsonProcessor.inputText.isEmpty)
             }
@@ -412,6 +449,48 @@ extension ContentView {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             jsonProcessor.unescapeJSONString()
+            withAnimation(animationManager.spring) {
+                isProcessing = false
+                showSuccessIndicator = true
+            }
+        }
+    }
+    
+    private func performUnicodeConversion() {
+        withAnimation(animationManager.spring) {
+            isProcessing = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            jsonProcessor.convertUnicodeToChineseCharacters()
+            withAnimation(animationManager.spring) {
+                isProcessing = false
+                showSuccessIndicator = true
+            }
+        }
+    }
+    
+    private func performHTMLConversion() {
+        withAnimation(animationManager.spring) {
+            isProcessing = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            jsonProcessor.convertHTMLToChineseCharacters()
+            withAnimation(animationManager.spring) {
+                isProcessing = false
+                showSuccessIndicator = true
+            }
+        }
+    }
+    
+    private func performURLDecoding() {
+        withAnimation(animationManager.spring) {
+            isProcessing = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            jsonProcessor.convertURLEncoding()
             withAnimation(animationManager.spring) {
                 isProcessing = false
                 showSuccessIndicator = true
