@@ -1,4 +1,0 @@
-module JSONHealer {
-header "JSONHealer-Swift.h"
-export *
-}
