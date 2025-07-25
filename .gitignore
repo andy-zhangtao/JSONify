@@ -61,3 +61,5 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 JSONify/JSONify.dmg
+JSONify/.claude/settings.local.json
+JSONify/JSONify.dmg
