@@ -54,4 +54,5 @@ extension Notification.Name {
     static let copyFormatted = Notification.Name("copyFormatted")
     static let pasteToInput = Notification.Name("pasteToInput")
     static let toggleViewMode = Notification.Name("toggleViewMode")
+    static let formatLargeFile = Notification.Name("formatLargeFile")
 }

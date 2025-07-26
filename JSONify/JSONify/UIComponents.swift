@@ -182,17 +182,38 @@ struct EnhancedTextEditor: View {
                 )
                 .cornerRadius(10)
                 .overlay(
-                    // 大文件提示
+                    // 大文件只读模式提示和控制
                     VStack {
                         HStack {
                             Spacer()
-                            Text("大文件只读模式")
-                                .font(.caption)
-                                .foregroundColor(.orange)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.orange.opacity(0.1))
-                                .cornerRadius(4)
+                            VStack(alignment: .trailing, spacing: 4) {
+                                Text("大文件只读模式")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.orange.opacity(0.1))
+                                    .cornerRadius(4)
+                                
+                                // 为大文件提供格式化按钮
+                                Button(action: {
+                                    // 触发格式化处理
+                                    NotificationCenter.default.post(name: .formatLargeFile, object: nil)
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "play.fill")
+                                            .font(.caption2)
+                                        Text("格式化")
+                                            .font(.caption2)
+                                    }
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 3)
+                                    .background(Color.blue.opacity(0.1))
+                                    .foregroundColor(.blue)
+                                    .cornerRadius(4)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                         Spacer()
                     }

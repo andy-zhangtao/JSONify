@@ -80,6 +80,10 @@ struct ContentView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .formatLargeFile)) { _ in
+            // 处理大文件格式化请求
+            performLargeFileFormat()
+        }
     }
 }
 
@@ -586,9 +590,16 @@ extension ContentView {
             
             func updateChunk(index: Int) {
                 guard index < chunks.count else {
-                    // 所有块加载完成
+                    // 所有块加载完成，触发JSON处理
                     isProcessing = false
                     showSuccessIndicator = true
+                    
+                    // 大文件加载完成后自动触发格式化
+                    if autoFormat {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            jsonProcessor.processJSON(sortKeys: sortKeys)
+                        }
+                    }
                     return
                 }
                 
@@ -681,6 +692,21 @@ extension ContentView {
     
     private func performURLDecoding() {
         jsonProcessor.convertURLEncoding()
+    }
+    
+    private func performLargeFileFormat() {
+        withAnimation(animationManager.spring) {
+            isProcessing = true
+        }
+        
+        // 大文件格式化使用更长的延迟，避免阻塞UI
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            jsonProcessor.processJSON(sortKeys: sortKeys)
+            withAnimation(animationManager.spring) {
+                isProcessing = false
+                showSuccessIndicator = true
+            }
+        }
     }
     
     private func clearHistory() {
