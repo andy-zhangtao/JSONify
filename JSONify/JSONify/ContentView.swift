@@ -494,18 +494,46 @@ extension ContentView {
     private var formattedJSONView: some View {
         ScrollView {
             if themeManager.useCustomColors {
+                // 对于大文件，语法高亮器也需要截断
+                let displayText = jsonProcessor.formattedJSON.count > 200000 ? 
+                    String(jsonProcessor.formattedJSON.prefix(200000)) + "\n\n... (JSON内容过长，已截断显示前200KB，完整内容可复制)" :
+                    jsonProcessor.formattedJSON
+                
                 NewSyntaxHighlightedTextView(
-                    text: .constant(jsonProcessor.formattedJSON),
+                    text: .constant(displayText),
                     fontSize: CGFloat(fontSize),
                     isEditable: false
                 )
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             } else {
                 VStack(alignment: .leading) {
-                    Text(jsonProcessor.formattedJSON)
-                        .themeAwareMonospacedFont(size: fontSize * themeManager.uiDensity.fontSizeMultiplier)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                    Group {
+                        // 对大文件截断显示，避免Text组件性能问题
+                        if jsonProcessor.formattedJSON.count > 200000 {
+                            VStack(alignment: .leading, spacing: 8) {
+                                // 截断提示
+                                HStack {
+                                    Image(systemName: "info.circle")
+                                        .foregroundColor(.orange)
+                                    Text("大文件显示模式：仅显示前200KB，完整内容可复制")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                }
+                                .padding(.bottom, 4)
+                                
+                                // 截断内容
+                                Text(String(jsonProcessor.formattedJSON.prefix(200000)) + "\n\n... (内容已截断)")
+                                    .themeAwareMonospacedFont(size: fontSize * themeManager.uiDensity.fontSizeMultiplier)
+                                    .textSelection(.enabled)
+                                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                            }
+                        } else {
+                            Text(jsonProcessor.formattedJSON)
+                                .themeAwareMonospacedFont(size: fontSize * themeManager.uiDensity.fontSizeMultiplier)
+                                .textSelection(.enabled)
+                                .frame(maxWidth: .infinity, alignment: .topLeading)
+                        }
+                    }
                     Spacer()
                 }
             }

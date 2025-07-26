@@ -73,28 +73,53 @@ class JSONProcessor: ObservableObject {
     private func performJSONProcessing(sortKeys: Bool) {
         let startTime = CFAbsoluteTimeGetCurrent()
         
+        print("🎯 开始JSON处理，输入大小: \(inputText.count)字符")
+        
+        // 更新进度状态
+        DispatchQueue.main.async {
+            self.isProcessing = true
+            self.processingProgress = 0.0
+            self.processingStatus = "解析JSON..."
+        }
+        
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             DispatchQueue.main.async {
                 self.validationError = .emptyInput
                 self.isValid = false
                 self.formattedJSON = ""
                 self.processingTime = nil
+                self.isProcessing = false
             }
             return
         }
         
         do {
-            // 先尝试直接解析JSON
+            // 第一步：解析JSON
+            print("📊 第1步：开始解析JSON数据")
             guard let data = inputText.data(using: String.Encoding.utf8) else {
                 DispatchQueue.main.async {
                     self.validationError = .invalidJSON(message: "无法解析输入", line: nil, column: nil)
                     self.isValid = false
                     self.formattedJSON = ""
+                    self.isProcessing = false
                 }
                 return
             }
             
+            // 更新进度
+            DispatchQueue.main.async {
+                self.processingProgress = 0.3
+                self.processingStatus = "验证JSON格式..."
+            }
+            
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+            print("📊 第2步：JSON解析成功")
+            
+            // 更新进度
+            DispatchQueue.main.async {
+                self.processingProgress = 0.6
+                self.processingStatus = "格式化JSON..."
+            }
             
             var options: JSONSerialization.WritingOptions = [.prettyPrinted]
             if sortKeys {
@@ -102,14 +127,32 @@ class JSONProcessor: ObservableObject {
             }
             
             let prettyData = try JSONSerialization.data(withJSONObject: jsonObject, options: options)
+            print("📊 第3步：JSON格式化完成")
+            
+            // 更新进度
+            DispatchQueue.main.async {
+                self.processingProgress = 0.9
+                self.processingStatus = "应用格式化结果..."
+            }
             
             if let prettyString = String(data: prettyData, encoding: .utf8) {
                 let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                DispatchQueue.main.async {
-                    self.formattedJSON = prettyString
-                    self.isValid = true
-                    self.validationError = nil
-                    self.processingTime = timeElapsed
+                print("📊 第4步：准备应用结果，格式化后大小: \(prettyString.count)字符")
+                
+                // 对于大文件，异步渐进式设置结果，避免UI冻结
+                if prettyString.count > 500000 {
+                    self.setLargeFormattedJSON(prettyString, timeElapsed: timeElapsed)
+                } else {
+                    DispatchQueue.main.async {
+                        self.formattedJSON = prettyString
+                        self.isValid = true
+                        self.validationError = nil
+                        self.processingTime = timeElapsed
+                        self.isProcessing = false
+                        self.processingProgress = 1.0
+                        self.processingStatus = "处理完成"
+                        print("✅ JSON处理完成")
+                    }
                 }
             } else {
                 throw JSONValidationError.invalidJSON(message: "格式化失败", line: nil, column: nil)
@@ -117,6 +160,7 @@ class JSONProcessor: ObservableObject {
             
         } catch {
             let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            print("❌ JSON处理失败: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 if let jsonError = error as? JSONValidationError {
                     self.validationError = jsonError
@@ -126,7 +170,27 @@ class JSONProcessor: ObservableObject {
                 self.isValid = false
                 self.formattedJSON = ""
                 self.processingTime = timeElapsed
+                self.isProcessing = false
+                self.processingProgress = 0.0
+                self.processingStatus = ""
             }
+        }
+    }
+    
+    // 异步渐进式设置大JSON结果，避免UI冻结
+    private func setLargeFormattedJSON(_ content: String, timeElapsed: TimeInterval) {
+        print("🚀 开始异步设置大JSON结果...")
+        
+        // 延迟一帧，让进度条有时间更新
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.formattedJSON = content
+            self.isValid = true
+            self.validationError = nil
+            self.processingTime = timeElapsed
+            self.isProcessing = false
+            self.processingProgress = 1.0
+            self.processingStatus = "处理完成"
+            print("✅ 大JSON结果设置完成，大小: \(content.count)字符")
         }
     }
     
