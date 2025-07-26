@@ -158,6 +158,19 @@ class JSONProcessor: ObservableObject {
         )
     }
     
+    // 同步版本供测试使用
+    func convertUnicodeToChineseCharactersSync() {
+        inputText = convertUnicodeSequences(inputText)
+    }
+    
+    func convertHTMLToChineseCharactersSync() {
+        inputText = convertHTMLEntities(inputText)
+    }
+    
+    func convertURLEncodingSync() {
+        inputText = convertURLEncodedString(inputText)
+    }
+    
     private func performEncodingConversion(type: String, converter: @escaping (String) -> String) {
         // 取消之前的处理
         cancelCurrentProcessing()
@@ -249,118 +262,138 @@ class JSONProcessor: ObservableObject {
     }
     
     private func convertUnicodeSequences(_ input: String) -> String {
-        // 使用流式字符串构建器，避免频繁内存重分配
-        var result = ""
-        result.reserveCapacity(input.count) // 预分配容量
-        
-        let unicodePattern = #"\\u([0-9a-fA-F]{4})"#
+        return performBatchReplacement(
+            input: input,
+            pattern: #"\\u([0-9a-fA-F]{4})"#,
+            transformer: { match, input in
+                // 提取十六进制值
+                guard let hexRange = Range(match.range(at: 1), in: input) else {
+                    return nil // 保留原文
+                }
+                let hexString = String(input[hexRange])
+                
+                // 转换为Unicode字符
+                guard let unicodeValue = UInt32(hexString, radix: 16),
+                      let scalar = UnicodeScalar(unicodeValue) else {
+                    return nil // 保留原文
+                }
+                
+                return String(Character(scalar))
+            }
+        )
+    }
+    
+    /// 批量替换算法核心实现
+    /// - Parameters:
+    ///   - input: 输入字符串  
+    ///   - pattern: 正则表达式模式
+    ///   - transformer: 转换函数，返回nil表示保留原文
+    /// - Returns: 处理后的字符串
+    private func performBatchReplacement(
+        input: String,
+        pattern: String,
+        transformer: (NSTextCheckingResult, String) -> String?
+    ) -> String {
         
         do {
-            let regex = try NSRegularExpression(pattern: unicodePattern, options: [])
+            let regex = try NSRegularExpression(pattern: pattern, options: [])
             let matches = regex.matches(in: input, options: [], range: NSRange(location: 0, length: input.count))
             
             if matches.isEmpty {
                 return input // 没有匹配，直接返回
             }
             
+            // 第一阶段：批量收集所有转换结果
+            var replacements: [(range: NSRange, replacement: String)] = []
+            replacements.reserveCapacity(matches.count)
+            
+            for (index, match) in matches.enumerated() {
+                if let replacement = transformer(match, input) {
+                    replacements.append((range: match.range, replacement: replacement))
+                }
+                // nil表示保留原文，不加入替换列表
+                
+                // 进度反馈：处理大批量匹配时更新进度
+                if matches.count > 1000 && index % 100 == 0 {
+                    let progress = Double(index) / Double(matches.count) * 0.3 // 第一阶段占30%
+                    DispatchQueue.main.async {
+                        if self.isProcessing {
+                            self.processingProgress = 0.1 + progress
+                        }
+                    }
+                }
+            }
+            
+            if replacements.isEmpty {
+                return input // 没有需要替换的内容
+            }
+            
+            // 第二阶段：计算最终字符串长度并预分配
+            let originalLength = input.count
+            let totalReplacementLength = replacements.reduce(0) { sum, item in
+                sum + item.replacement.count - item.range.length
+            }
+            let estimatedFinalLength = originalLength + totalReplacementLength
+            
+            // 第三阶段：一次性构建最终字符串
+            var result = ""
+            result.reserveCapacity(max(estimatedFinalLength, originalLength))
+            
             var lastLocation = 0
             
-            // 一次性构建结果字符串，避免反复替换
-            for match in matches {
-                let matchRange = match.range
-                let hexRange = match.range(at: 1)
+            for (index, replacement) in replacements.enumerated() {
+                let matchRange = replacement.range
                 
-                // 添加匹配前的部分
+                // 添加匹配前的原始文本
                 if lastLocation < matchRange.location {
                     let startIndex = input.index(input.startIndex, offsetBy: lastLocation)
                     let endIndex = input.index(input.startIndex, offsetBy: matchRange.location)
-                    result.append(String(input[startIndex..<endIndex]))
+                    result.append(contentsOf: input[startIndex..<endIndex])
                 }
                 
-                // 转换Unicode序列
-                if let hexStringRange = Range(hexRange, in: input) {
-                    let hexString = String(input[hexStringRange])
-                    if let unicodeValue = UInt32(hexString, radix: 16),
-                       let scalar = UnicodeScalar(unicodeValue) {
-                        result.append(Character(scalar))
-                    } else {
-                        // 如果转换失败，保留原始文本
-                        let fullRange = Range(matchRange, in: input)!
-                        result.append(String(input[fullRange]))
-                    }
-                } else {
-                    // 如果范围无效，保留原始文本
-                    let fullRange = Range(matchRange, in: input)!
-                    result.append(String(input[fullRange]))
-                }
+                // 添加替换文本
+                result.append(replacement.replacement)
                 
                 lastLocation = matchRange.location + matchRange.length
+                
+                // 进度反馈：构建阶段进度
+                if replacements.count > 1000 && index % 200 == 0 {
+                    let progress = Double(index) / Double(replacements.count) * 0.5 // 第三阶段占50%
+                    DispatchQueue.main.async {
+                        if self.isProcessing {
+                            self.processingProgress = 0.4 + progress
+                        }
+                    }
+                }
             }
             
-            // 添加最后一部分
+            // 添加最后剩余的原始文本
             if lastLocation < input.count {
                 let startIndex = input.index(input.startIndex, offsetBy: lastLocation)
-                result.append(String(input[startIndex...]))
+                result.append(contentsOf: input[startIndex...])
             }
             
+            return result
+            
         } catch {
-            // 如果正则表达式失败，返回原字符串
+            // 正则表达式错误，返回原字符串
             return input
         }
-        
-        return result
     }
     
     private func convertHTMLEntities(_ input: String) -> String {
-        // 使用流式字符串构建，一次性处理所有类型的HTML实体
-        var result = ""
-        result.reserveCapacity(input.count)
-        
-        // 合并所有HTML实体模式，一次扫描处理
-        let combinedPattern = #"&(?:amp|lt|gt|quot|apos|nbsp);|&#(\d+);|&#x([0-9a-fA-F]+);|&#39;|&#34;|&#38;|&#60;|&#62;|&#160;"#
-        
-        do {
-            let regex = try NSRegularExpression(pattern: combinedPattern, options: [])
-            let matches = regex.matches(in: input, options: [], range: NSRange(location: 0, length: input.count))
-            
-            if matches.isEmpty {
-                return input // 没有HTML实体，直接返回
-            }
-            
-            var lastLocation = 0
-            
-            for match in matches {
-                let matchRange = match.range
-                
-                // 添加匹配前的部分
-                if lastLocation < matchRange.location {
-                    let startIndex = input.index(input.startIndex, offsetBy: lastLocation)
-                    let endIndex = input.index(input.startIndex, offsetBy: matchRange.location)
-                    result.append(String(input[startIndex..<endIndex]))
-                }
-                
+        return performBatchReplacement(
+            input: input,
+            pattern: #"&(?:amp|lt|gt|quot|apos|nbsp);|&#(\d+);|&#x([0-9a-fA-F]+);|&#39;|&#34;|&#38;|&#60;|&#62;|&#160;"#,
+            transformer: { match, input in
                 // 获取匹配的实体
-                let fullRange = Range(matchRange, in: input)!
+                let fullRange = Range(match.range, in: input)!
                 let entity = String(input[fullRange])
                 
                 // 转换实体
-                let replacement = convertSingleHTMLEntity(entity)
-                result.append(replacement)
-                
-                lastLocation = matchRange.location + matchRange.length
+                return self.convertSingleHTMLEntity(entity)
             }
-            
-            // 添加最后一部分
-            if lastLocation < input.count {
-                let startIndex = input.index(input.startIndex, offsetBy: lastLocation)
-                result.append(String(input[startIndex...]))
-            }
-            
-        } catch {
-            return input
-        }
-        
-        return result
+        )
     }
     
     private func convertSingleHTMLEntity(_ entity: String) -> String {
@@ -401,7 +434,7 @@ class JSONProcessor: ObservableObject {
     }
     
     private func convertURLEncodedString(_ input: String) -> String {
-        // 使用 Foundation 的 URL 解码功能
+        // URL解码使用Foundation的内置方法，它对整个字符串更有效
         guard let decoded = input.removingPercentEncoding else {
             return input
         }

@@ -5,6 +5,7 @@
 //  Created by 张涛 on 7/14/25.
 //
 
+import Foundation
 import Testing
 @testable import JSONify
 
@@ -87,7 +88,7 @@ struct JSONProcessorEncodingConversionTests {
         
         // 测试基本Unicode转换
         processor.inputText = "\\u4e2d\\u6587"  // 中文
-        processor.convertUnicodeToChineseCharacters()
+        processor.convertUnicodeToChineseCharactersSync()
         
         #expect(processor.inputText == "中文")
     }
@@ -97,7 +98,7 @@ struct JSONProcessorEncodingConversionTests {
         
         // 测试在JSON中的Unicode转换
         processor.inputText = "{\"name\": \"\\u5f20\\u4e09\", \"city\": \"\\u5317\\u4eac\"}"  // 张三, 北京
-        processor.convertUnicodeToChineseCharacters()
+        processor.convertUnicodeToChineseCharactersSync()
         
         #expect(processor.inputText.contains("张三"))
         #expect(processor.inputText.contains("北京"))
@@ -107,7 +108,7 @@ struct JSONProcessorEncodingConversionTests {
         let processor = JSONProcessor()
         
         processor.inputText = "Hello \\u4e16\\u754c! Welcome to \\u4e2d\\u56fd"  // 世界, 中国
-        processor.convertUnicodeToChineseCharacters()
+        processor.convertUnicodeToChineseCharactersSync()
         
         #expect(processor.inputText == "Hello 世界! Welcome to 中国")
     }
@@ -116,7 +117,7 @@ struct JSONProcessorEncodingConversionTests {
         let processor = JSONProcessor()
         
         processor.inputText = "&lt;div&gt;Hello &amp; World&lt;/div&gt;"
-        processor.convertHTMLToChineseCharacters()
+        processor.convertHTMLToChineseCharactersSync()
         
         #expect(processor.inputText == "<div>Hello & World</div>")
     }
@@ -126,7 +127,7 @@ struct JSONProcessorEncodingConversionTests {
         
         // 测试数字实体
         processor.inputText = "&#20013;&#25991; - &#72;&#101;&#108;&#108;&#111;"  // 中文 - Hello
-        processor.convertHTMLToChineseCharacters()
+        processor.convertHTMLToChineseCharactersSync()
         
         #expect(processor.inputText == "中文 - Hello")
     }
@@ -136,7 +137,7 @@ struct JSONProcessorEncodingConversionTests {
         
         // 测试十六进制实体
         processor.inputText = "&#x4E2D;&#x6587;"  // 中文
-        processor.convertHTMLToChineseCharacters()
+        processor.convertHTMLToChineseCharactersSync()
         
         #expect(processor.inputText == "中文")
     }
@@ -145,7 +146,7 @@ struct JSONProcessorEncodingConversionTests {
         let processor = JSONProcessor()
         
         processor.inputText = "&quot;Hello&quot; &amp; &#20013;&#25991; &lt;test&gt;"
-        processor.convertHTMLToChineseCharacters()
+        processor.convertHTMLToChineseCharactersSync()
         
         #expect(processor.inputText == "\"Hello\" & 中文 <test>")
     }
@@ -154,7 +155,7 @@ struct JSONProcessorEncodingConversionTests {
         let processor = JSONProcessor()
         
         processor.inputText = "Hello%20World%21"  // Hello World!
-        processor.convertURLEncoding()
+        processor.convertURLEncodingSync()
         
         #expect(processor.inputText == "Hello World!")
     }
@@ -164,7 +165,7 @@ struct JSONProcessorEncodingConversionTests {
         
         // URL编码的中文
         processor.inputText = "%E4%B8%AD%E6%96%87%E6%B5%8B%E8%AF%95"  // 中文测试
-        processor.convertURLEncoding()
+        processor.convertURLEncodingSync()
         
         #expect(processor.inputText == "中文测试")
     }
@@ -173,7 +174,7 @@ struct JSONProcessorEncodingConversionTests {
         let processor = JSONProcessor()
         
         processor.inputText = "{%22name%22%3A%22%E5%BC%A0%E4%B8%89%22%2C%22age%22%3A25}"
-        processor.convertURLEncoding()
+        processor.convertURLEncodingSync()
         
         #expect(processor.inputText.contains("张三"))
         #expect(processor.inputText.contains("\"name\""))
@@ -188,13 +189,13 @@ struct JSONProcessorEncodingConversionTests {
         processor.inputText = input
         
         // 先进行URL解码
-        processor.convertURLEncoding()
+        processor.convertURLEncodingSync()
         
         // 再进行Unicode转换
-        processor.convertUnicodeToChineseCharacters()
+        processor.convertUnicodeToChineseCharactersSync()
         
         // 最后进行HTML转换
-        processor.convertHTMLToChineseCharacters()
+        processor.convertHTMLToChineseCharactersSync()
         
         #expect(processor.inputText.contains("你好"))
         #expect(processor.inputText.contains("&"))
@@ -207,9 +208,9 @@ struct JSONProcessorEncodingConversionTests {
         // 测试编码链：先URL解码，再Unicode转换，最后HTML转换
         processor.inputText = "%7B%22user%22%3A%22%5Cu5f20%5Cu4e09%22%2C%22message%22%3A%22%26quot%3BHello%26quot%3B%22%7D"
         
-        processor.convertURLEncoding()
-        processor.convertUnicodeToChineseCharacters()
-        processor.convertHTMLToChineseCharacters()
+        processor.convertURLEncodingSync()
+        processor.convertUnicodeToChineseCharactersSync()
+        processor.convertHTMLToChineseCharactersSync()
         
         // 验证最终结果是合法的JSON
         let resultData = processor.inputText.data(using: .utf8)!
@@ -230,9 +231,9 @@ struct JSONProcessorEncodingConversionTests {
         let originalText = "{\"name\": \"张三\", \"message\": \"Hello World\"}"
         processor.inputText = originalText
         
-        processor.convertUnicodeToChineseCharacters()
-        processor.convertHTMLToChineseCharacters()
-        processor.convertURLEncoding()
+        processor.convertUnicodeToChineseCharactersSync()
+        processor.convertHTMLToChineseCharactersSync()
+        processor.convertURLEncodingSync()
         
         #expect(processor.inputText == originalText)
     }
@@ -242,14 +243,14 @@ struct JSONProcessorEncodingConversionTests {
         
         // 测试无效编码的处理
         processor.inputText = "\\uXXXX invalid unicode"
-        processor.convertUnicodeToChineseCharacters()
+        processor.convertUnicodeToChineseCharactersSync()
         
         // 应该保持原样
         #expect(processor.inputText == "\\uXXXX invalid unicode")
         
         // 测试无效URL编码
         processor.inputText = "%ZZ invalid url encoding"
-        processor.convertURLEncoding()
+        processor.convertURLEncodingSync()
         
         // 应该保持原样
         #expect(processor.inputText == "%ZZ invalid url encoding")
