@@ -174,12 +174,8 @@ struct EnhancedTextEditor: View {
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                         } else {
-                            // 对大文件使用截断显示，避免性能问题
-                            let displayContent = displayText.count > 100000 ? 
-                                String(displayText.prefix(100000)) + "\n\n... (文件内容过长，已截断显示前100KB，但完整内容已加载用于处理)" :
-                                displayText
-                            
-                            Text(displayContent)
+                            // displayText 已经在同步时被截断，直接使用
+                            Text(displayText)
                                 .themeAwareMonospacedFont(size: 14 * themeManager.uiDensity.fontSizeMultiplier)
                                 .textSelection(.enabled)
                                 .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -274,23 +270,42 @@ struct EnhancedTextEditor: View {
             }
         }
         .onChange(of: text) { _, newValue in
+            print("📝 EnhancedTextEditor text 改变: \(newValue.count)字符")
             let isLarge = newValue.count > 500000
             
             // 更新大文件状态
             if isLarge != isLargeFile {
+                print("🔄 切换文件模式: 大文件=\(isLarge)")
                 withAnimation(.easeInOut(duration: 0.3)) {
                     isLargeFile = isLarge
                 }
             }
             
-            // 同步显示文本，避免循环更新
+            // 同步显示文本，大文件立即截断避免UI冻结
             if newValue != displayText {
-                displayText = newValue
+                print("🔄 同步显示文本: \(newValue.count)字符")
+                
+                // 对大文件立即截断，避免UI冻结
+                if isLarge && newValue.count > 100000 {
+                    let truncatedContent = String(newValue.prefix(100000)) + "\n\n... (文件内容过长，已截断显示前100KB，但完整内容已加载用于处理)"
+                    displayText = truncatedContent
+                    print("📏 文本已截断到: \(truncatedContent.count)字符")
+                } else {
+                    displayText = newValue
+                }
             }
         }
         .onAppear {
-            displayText = text
-            isLargeFile = text.count > 500000
+            let isLarge = text.count > 500000
+            isLargeFile = isLarge
+            
+            // 初始化时也要截断大文件
+            if isLarge && text.count > 100000 {
+                displayText = String(text.prefix(100000)) + "\n\n... (文件内容过长，已截断显示前100KB，但完整内容已加载用于处理)"
+                print("📏 初始化时文本已截断到: \(displayText.count)字符")
+            } else {
+                displayText = text
+            }
         }
     }
     

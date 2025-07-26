@@ -559,10 +559,14 @@ extension ContentView {
             return
         }
         
+        print("📁 文件加载: 大小=\(content.count)字符")
+        
         // 对于大文件（>500KB），采用渐进式加载
         if content.count > 500000 {
+            print("🔄 使用大文件加载模式")
             await loadLargeFileContent(content)
         } else {
+            print("⚡ 使用普通文件加载模式")
             await MainActor.run {
                 withAnimation(animationManager.smooth) {
                     jsonProcessor.inputText = content
@@ -573,6 +577,8 @@ extension ContentView {
     }
     
     private func loadLargeFileContent(_ content: String) async {
+        print("🚀 开始大文件加载...")
+        
         await MainActor.run {
             isProcessing = true
         }
@@ -580,18 +586,24 @@ extension ContentView {
         // 延迟更新，让UI有时间响应
         try? await Task.sleep(for: .milliseconds(200))
         
+        print("📝 设置大文件内容到处理器...")
+        
         // 简化大文件加载：直接设置内容，不进行分块
         await MainActor.run {
             // 直接设置内容，让EnhancedTextEditor处理大文件显示
             jsonProcessor.inputText = content
+            print("✅ 大文件内容已设置, 字符数: \(content.count)")
             
             // 标记加载完成
             isProcessing = false
             showSuccessIndicator = true
+            print("🎉 大文件加载完成")
             
             // 大文件加载完成后自动触发格式化
             if autoFormat {
+                print("🔄 准备自动格式化...")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    print("🎯 开始自动格式化")
                     jsonProcessor.processJSON(sortKeys: sortKeys)
                 }
             }
@@ -599,8 +611,11 @@ extension ContentView {
     }
     
     private func handleTextChange(_ newValue: String) {
+        print("🔄 handleTextChange 被调用, 文本长度: \(newValue.count)")
+        
         // 如果正在分块加载大文件，跳过自动格式化以避免重复处理
         if isProcessing {
+            print("⏸️ 跳过处理 - 正在加载中")
             return
         }
         
@@ -610,9 +625,11 @@ extension ContentView {
         
         // 根据文件大小调整处理延迟
         let processingDelay: TimeInterval = newValue.count > 500000 ? 1.0 : 0.3
+        print("⏱️ 处理延迟: \(processingDelay)秒")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + processingDelay) {
             if autoFormat {
+                print("🎯 开始自动格式化处理")
                 jsonProcessor.processJSON(sortKeys: sortKeys)
             }
             
