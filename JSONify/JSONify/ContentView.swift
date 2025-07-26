@@ -113,6 +113,22 @@ extension ContentView {
                         .foregroundColor(.secondary)
                 }
                 .pageTransition(isActive: isProcessing)
+            } else if jsonProcessor.isProcessing {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        ProgressView(value: jsonProcessor.processingProgress)
+                            .frame(width: 120)
+                        Text(jsonProcessor.processingStatus)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    if jsonProcessor.processingProgress > 0 {
+                        Text("\(Int(jsonProcessor.processingProgress * 100))%")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .pageTransition(isActive: jsonProcessor.isProcessing)
             }
             
             if showSuccessIndicator {
@@ -457,45 +473,15 @@ extension ContentView {
     }
     
     private func performUnicodeConversion() {
-        withAnimation(animationManager.spring) {
-            isProcessing = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            jsonProcessor.convertUnicodeToChineseCharacters()
-            withAnimation(animationManager.spring) {
-                isProcessing = false
-                showSuccessIndicator = true
-            }
-        }
+        jsonProcessor.convertUnicodeToChineseCharacters()
     }
     
     private func performHTMLConversion() {
-        withAnimation(animationManager.spring) {
-            isProcessing = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            jsonProcessor.convertHTMLToChineseCharacters()
-            withAnimation(animationManager.spring) {
-                isProcessing = false
-                showSuccessIndicator = true
-            }
-        }
+        jsonProcessor.convertHTMLToChineseCharacters()
     }
     
     private func performURLDecoding() {
-        withAnimation(animationManager.spring) {
-            isProcessing = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            jsonProcessor.convertURLEncoding()
-            withAnimation(animationManager.spring) {
-                isProcessing = false
-                showSuccessIndicator = true
-            }
-        }
+        jsonProcessor.convertURLEncoding()
     }
     
     private func clearHistory() {
