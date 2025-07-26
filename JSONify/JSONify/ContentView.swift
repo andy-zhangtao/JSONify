@@ -555,20 +555,70 @@ extension ContentView {
             return
         }
         
-        await MainActor.run {
-            withAnimation(animationManager.smooth) {
-                jsonProcessor.inputText = content
-                showSuccessIndicator = true
+        // 对于大文件（>500KB），采用渐进式加载
+        if content.count > 500000 {
+            await loadLargeFileContent(content)
+        } else {
+            await MainActor.run {
+                withAnimation(animationManager.smooth) {
+                    jsonProcessor.inputText = content
+                    showSuccessIndicator = true
+                }
             }
         }
     }
     
+    private func loadLargeFileContent(_ content: String) async {
+        await MainActor.run {
+            isProcessing = true
+        }
+        
+        // 延迟更新，让UI有时间响应
+        try? await Task.sleep(for: .milliseconds(100))
+        
+        await MainActor.run {
+            // 分批更新文本内容，减少主线程阻塞
+            let chunks = stride(from: 0, to: content.count, by: 50000).map {
+                String(content.dropFirst($0).prefix(50000))
+            }
+            
+            var currentText = ""
+            
+            func updateChunk(index: Int) {
+                guard index < chunks.count else {
+                    // 所有块加载完成
+                    isProcessing = false
+                    showSuccessIndicator = true
+                    return
+                }
+                
+                currentText += chunks[index]
+                jsonProcessor.inputText = currentText
+                
+                // 延迟加载下一块，避免阻塞UI
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    updateChunk(index: index + 1)
+                }
+            }
+            
+            updateChunk(index: 0)
+        }
+    }
+    
     private func handleTextChange(_ newValue: String) {
+        // 如果正在分块加载大文件，跳过自动格式化以避免重复处理
+        if isProcessing {
+            return
+        }
+        
         withAnimation(animationManager.quick) {
             isProcessing = !newValue.isEmpty
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // 根据文件大小调整处理延迟
+        let processingDelay: TimeInterval = newValue.count > 500000 ? 1.0 : 0.3
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + processingDelay) {
             if autoFormat {
                 jsonProcessor.processJSON(sortKeys: sortKeys)
             }
@@ -583,8 +633,11 @@ extension ContentView {
         
         saveTimer?.invalidate()
         
+        // 对大文件延迟保存到历史记录
+        let saveDelay: TimeInterval = newValue.count > 500000 ? 3.0 : 1.5
+        
         if jsonProcessor.isValid && !newValue.isEmpty {
-            saveTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
+            saveTimer = Timer.scheduledTimer(withTimeInterval: saveDelay, repeats: false) { _ in
                 historyManager.addSession(newValue)
             }
         }

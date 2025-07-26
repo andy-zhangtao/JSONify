@@ -160,27 +160,76 @@ struct EnhancedTextEditor: View {
     let isValid: Bool
     @EnvironmentObject private var themeManager: ThemeManager
     @State private var isFocused = false
+    @State private var displayText: String = ""
+    @State private var isLargeFile = false
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            TextEditor(text: $text)
-                .themeAwareMonospacedFont(size: 14 * themeManager.uiDensity.fontSizeMultiplier)
-                .padding(12)
-                .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor) ?? .clear)
-                .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor) ?? .primary)
+            if isLargeFile {
+                // 大文件只读模式，提高性能
+                ScrollView {
+                    Text(displayText)
+                        .themeAwareMonospacedFont(size: 14 * themeManager.uiDensity.fontSizeMultiplier)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .padding(12)
+                        .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor) ?? .clear)
+                        .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor) ?? .primary)
+                }
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(borderColor, lineWidth: isFocused ? 2 : 1)
-                        .animation(.easeInOut(duration: 0.2), value: isFocused)
+                        .stroke(borderColor, lineWidth: 1)
                 )
                 .cornerRadius(10)
-                .onFocusChange { focused in
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        isFocused = focused
+                .overlay(
+                    // 大文件提示
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Text("大文件只读模式")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.orange.opacity(0.1))
+                                .cornerRadius(4)
+                        }
+                        Spacer()
                     }
-                }
+                    .padding(8),
+                    alignment: .topTrailing
+                )
+            } else {
+                TextEditor(text: $displayText)
+                    .themeAwareMonospacedFont(size: 14 * themeManager.uiDensity.fontSizeMultiplier)
+                    .padding(12)
+                    .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor) ?? .clear)
+                    .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor) ?? .primary)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(borderColor, lineWidth: isFocused ? 2 : 1)
+                            .animation(.easeInOut(duration: 0.2), value: isFocused)
+                    )
+                    .cornerRadius(10)
+                    .onReceive(NotificationCenter.default.publisher(for: NSTextView.didBeginEditingNotification)) { _ in
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            isFocused = true
+                        }
+                    }
+                    .onReceive(NotificationCenter.default.publisher(for: NSTextView.didEndEditingNotification)) { _ in
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            isFocused = false
+                        }
+                    }
+                    .onChange(of: displayText) { _, newValue in
+                        // 双向绑定，但避免循环更新
+                        if newValue != text {
+                            text = newValue
+                        }
+                    }
+            }
             
-            if text.isEmpty {
+            if displayText.isEmpty {
                 Text(placeholder)
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 16)
@@ -190,13 +239,28 @@ struct EnhancedTextEditor: View {
                     .animation(.easeInOut(duration: 0.2), value: isFocused)
             }
         }
+        .onChange(of: text) { _, newValue in
+            let isLarge = newValue.count > 500000
+            
+            if isLarge != isLargeFile {
+                isLargeFile = isLarge
+            }
+            
+            if newValue != displayText {
+                displayText = newValue
+            }
+        }
+        .onAppear {
+            displayText = text
+            isLargeFile = text.count > 500000
+        }
     }
     
     private var borderColor: Color {
         if isFocused {
             return isValid ? .green : .blue
         } else {
-            return isValid ? .green : (text.isEmpty ? .gray : .red)
+            return isValid ? .green : (displayText.isEmpty ? .gray : .red)
         }
     }
 }
