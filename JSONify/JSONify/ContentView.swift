@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @StateObject private var jsonProcessor = JSONProcessor()
     @StateObject private var historyManager = SessionHistoryManager()
     @StateObject private var animationManager = AnimationManager.shared
+    @StateObject private var fileManager = JSONFileManager()
     @State private var showingCopyAlert = false
+    @State private var showingFileError = false
     @State private var viewMode: ViewMode = .formatted
     @State private var saveTimer: Timer?
     @State private var isProcessing = false
@@ -47,6 +50,11 @@ struct ContentView: View {
         } message: {
             Text("JSON 数据已复制到剪贴板")
         }
+        .alert("文件读取错误", isPresented: $showingFileError) {
+            Button("确定", role: .cancel) { }
+        } message: {
+            Text(fileManager.fileError?.localizedDescription ?? "未知错误")
+        }
         .onReceive(NotificationCenter.default.publisher(for: .clearInput)) { _ in
             withAnimation(.easeInOut(duration: 0.2)) {
                 jsonProcessor.inputText = ""
@@ -80,6 +88,7 @@ extension ContentView {
     private var leftInputArea: some View {
         VStack(alignment: .leading, spacing: 20) {
             inputHeaderView
+            fileSelectionView
             inputEditorView
             inputErrorView
             manualFormatButtonView
@@ -88,6 +97,23 @@ extension ContentView {
         }
         .padding()
         .frame(minWidth: 450)
+        .background(
+            FilePicker(selectedURL: $fileManager.selectedFileURL, isPresented: $fileManager.isFilePickerPresented)
+                .frame(width: 0, height: 0)
+                .hidden()
+        )
+        .onChange(of: fileManager.selectedFileURL) { _, newURL in
+            if newURL != nil {
+                Task {
+                    await loadSelectedFile()
+                }
+            }
+        }
+        .onChange(of: fileManager.fileError) { _, error in
+            if error != nil {
+                showingFileError = true
+            }
+        }
     }
     
     private var inputHeaderView: some View {
@@ -229,6 +255,113 @@ extension ContentView {
                     }
                 }
                 .pageTransition(isActive: !jsonProcessor.inputText.isEmpty)
+            }
+        }
+    }
+    
+    private var fileSelectionView: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Button(action: {
+                    fileManager.presentFilePicker()
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "folder.badge.plus")
+                        Text("选择文件")
+                    }
+                }
+                .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                .animatedScale(trigger: true)
+                
+                if fileManager.isLoading {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("读取中...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .pageTransition(isActive: fileManager.isLoading)
+                }
+                
+                if !fileManager.selectedFileName.isEmpty {
+                    Button(action: {
+                        fileManager.clearSelection()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                            Text("清除选择")
+                        }
+                    }
+                    .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                    .animatedScale(trigger: !fileManager.selectedFileName.isEmpty, scale: 0.98)
+                }
+                
+                Spacer()
+            }
+            
+            if !fileManager.selectedFileName.isEmpty {
+                HStack(spacing: 8) {
+                    Image(systemName: "doc.text.fill")
+                        .foregroundColor(.blue)
+                    Text("已选择：\(fileManager.selectedFileName)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.blue.opacity(0.1))
+                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                )
+                .pageTransition(isActive: !fileManager.selectedFileName.isEmpty)
+            }
+            
+            // 最近文件列表
+            if !fileManager.recentFiles.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("最近打开的文件")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            fileManager.clearRecentFiles()
+                        }) {
+                            Text("清空")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(fileManager.recentFiles.prefix(5)) { recentFile in
+                                RecentFileButton(
+                                    file: recentFile,
+                                    onSelect: { url in
+                                        fileManager.selectedFileURL = url
+                                    },
+                                    onRemove: { file in
+                                        fileManager.removeFromRecentFiles(file)
+                                    }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 4)
+                    }
+                    .frame(height: 60)
+                }
+                .pageTransition(isActive: !fileManager.recentFiles.isEmpty)
             }
         }
     }
@@ -417,6 +550,19 @@ extension ContentView {
         }
     }
     
+    private func loadSelectedFile() async {
+        guard let content = await fileManager.readSelectedFile() else {
+            return
+        }
+        
+        await MainActor.run {
+            withAnimation(animationManager.smooth) {
+                jsonProcessor.inputText = content
+                showSuccessIndicator = true
+            }
+        }
+    }
+    
     private func handleTextChange(_ newValue: String) {
         withAnimation(animationManager.quick) {
             isProcessing = !newValue.isEmpty
@@ -569,6 +715,80 @@ struct SimpleHistoryBubble: View {
         formatter.dateStyle = .none
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+}
+
+// MARK: - 最近文件按钮组件
+struct RecentFileButton: View {
+    let file: JSONFileManager.RecentFile
+    let onSelect: (URL) -> Void
+    let onRemove: (JSONFileManager.RecentFile) -> Void
+    
+    @State private var isHovered = false
+    
+    var body: some View {
+        Button(action: {
+            onSelect(file.url)
+        }) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Image(systemName: file.name.hasSuffix(".json") ? "doc.text.fill" : "doc.text")
+                        .foregroundColor(.blue)
+                        .font(.caption)
+                    
+                    Text(file.name)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                
+                Text(formatFileSize(file.fileSize))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                
+                Text(formatRelativeDate(file.accessDate))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .padding(8)
+            .frame(width: 120, height: 50)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.gray.opacity(isHovered ? 0.15 : 0.1))
+                    .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+            )
+            .onHover { hovering in
+                isHovered = hovering
+            }
+            .overlay(
+                Button(action: {
+                    onRemove(file)
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                        .background(Color.white, in: Circle())
+                        .font(.caption)
+                }
+                .buttonStyle(.plain)
+                .opacity(isHovered ? 1.0 : 0.0),
+                alignment: .topTrailing
+            )
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private func formatFileSize(_ bytes: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: bytes)
+    }
+    
+    private func formatRelativeDate(_ date: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .named
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
 

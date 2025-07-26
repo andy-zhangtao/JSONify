@@ -34,7 +34,8 @@
       "Bash(git branch:*)",
       "Bash(security find-identity:*)",
       "Bash(find:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(open:*)"
     ],
     "deny": []
   }
