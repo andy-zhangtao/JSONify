@@ -73,8 +73,6 @@ class JSONProcessor: ObservableObject {
     private func performJSONProcessing(sortKeys: Bool) {
         let startTime = CFAbsoluteTimeGetCurrent()
         
-        print("🎯 开始JSON处理，输入大小: \(inputText.count)字符")
-        
         // 更新进度状态
         DispatchQueue.main.async {
             self.isProcessing = true
@@ -95,7 +93,6 @@ class JSONProcessor: ObservableObject {
         
         do {
             // 第一步：解析JSON
-            print("📊 第1步：开始解析JSON数据")
             guard let data = inputText.data(using: String.Encoding.utf8) else {
                 DispatchQueue.main.async {
                     self.validationError = .invalidJSON(message: "无法解析输入", line: nil, column: nil)
@@ -113,7 +110,6 @@ class JSONProcessor: ObservableObject {
             }
             
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
-            print("📊 第2步：JSON解析成功")
             
             // 更新进度
             DispatchQueue.main.async {
@@ -127,7 +123,6 @@ class JSONProcessor: ObservableObject {
             }
             
             let prettyData = try JSONSerialization.data(withJSONObject: jsonObject, options: options)
-            print("📊 第3步：JSON格式化完成")
             
             // 更新进度
             DispatchQueue.main.async {
@@ -137,7 +132,6 @@ class JSONProcessor: ObservableObject {
             
             if let prettyString = String(data: prettyData, encoding: .utf8) {
                 let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                print("📊 第4步：准备应用结果，格式化后大小: \(prettyString.count)字符")
                 
                 // 对于大文件，异步渐进式设置结果，避免UI冻结
                 if prettyString.count > 500000 {
@@ -151,7 +145,6 @@ class JSONProcessor: ObservableObject {
                         self.isProcessing = false
                         self.processingProgress = 1.0
                         self.processingStatus = "处理完成"
-                        print("✅ JSON处理完成")
                     }
                 }
             } else {
@@ -160,7 +153,6 @@ class JSONProcessor: ObservableObject {
             
         } catch {
             let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-            print("❌ JSON处理失败: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 if let jsonError = error as? JSONValidationError {
                     self.validationError = jsonError
@@ -179,8 +171,6 @@ class JSONProcessor: ObservableObject {
     
     // 异步渐进式设置大JSON结果，避免UI冻结
     private func setLargeFormattedJSON(_ content: String, timeElapsed: TimeInterval) {
-        print("🚀 开始异步设置大JSON结果...")
-        
         // 延迟一帧，让进度条有时间更新
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.formattedJSON = content
@@ -190,7 +180,6 @@ class JSONProcessor: ObservableObject {
             self.isProcessing = false
             self.processingProgress = 1.0
             self.processingStatus = "处理完成"
-            print("✅ 大JSON结果设置完成，大小: \(content.count)字符")
         }
     }
     
