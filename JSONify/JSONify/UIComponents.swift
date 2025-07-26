@@ -168,13 +168,26 @@ struct EnhancedTextEditor: View {
             if isLargeFile {
                 // 大文件只读模式，提高性能
                 ScrollView {
-                    Text(displayText)
-                        .themeAwareMonospacedFont(size: 14 * themeManager.uiDensity.fontSizeMultiplier)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                        .padding(12)
-                        .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor) ?? .clear)
-                        .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor) ?? .primary)
+                    Group {
+                        if displayText.isEmpty {
+                            Text("正在加载大文件...")
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            // 对大文件使用截断显示，避免性能问题
+                            let displayContent = displayText.count > 100000 ? 
+                                String(displayText.prefix(100000)) + "\n\n... (文件内容过长，已截断显示前100KB，但完整内容已加载用于处理)" :
+                                displayText
+                            
+                            Text(displayContent)
+                                .themeAwareMonospacedFont(size: 14 * themeManager.uiDensity.fontSizeMultiplier)
+                                .textSelection(.enabled)
+                                .frame(maxWidth: .infinity, alignment: .topLeading)
+                                .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor) ?? .clear)
+                                .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor) ?? .primary)
+                        }
+                    }
+                    .padding(12)
                 }
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -263,10 +276,14 @@ struct EnhancedTextEditor: View {
         .onChange(of: text) { _, newValue in
             let isLarge = newValue.count > 500000
             
+            // 更新大文件状态
             if isLarge != isLargeFile {
-                isLargeFile = isLarge
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isLargeFile = isLarge
+                }
             }
             
+            // 同步显示文本，避免循环更新
             if newValue != displayText {
                 displayText = newValue
             }

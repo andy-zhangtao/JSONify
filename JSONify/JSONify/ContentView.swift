@@ -578,41 +578,23 @@ extension ContentView {
         }
         
         // 延迟更新，让UI有时间响应
-        try? await Task.sleep(for: .milliseconds(100))
+        try? await Task.sleep(for: .milliseconds(200))
         
+        // 简化大文件加载：直接设置内容，不进行分块
         await MainActor.run {
-            // 分批更新文本内容，减少主线程阻塞
-            let chunks = stride(from: 0, to: content.count, by: 50000).map {
-                String(content.dropFirst($0).prefix(50000))
-            }
+            // 直接设置内容，让EnhancedTextEditor处理大文件显示
+            jsonProcessor.inputText = content
             
-            var currentText = ""
+            // 标记加载完成
+            isProcessing = false
+            showSuccessIndicator = true
             
-            func updateChunk(index: Int) {
-                guard index < chunks.count else {
-                    // 所有块加载完成，触发JSON处理
-                    isProcessing = false
-                    showSuccessIndicator = true
-                    
-                    // 大文件加载完成后自动触发格式化
-                    if autoFormat {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            jsonProcessor.processJSON(sortKeys: sortKeys)
-                        }
-                    }
-                    return
-                }
-                
-                currentText += chunks[index]
-                jsonProcessor.inputText = currentText
-                
-                // 延迟加载下一块，避免阻塞UI
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    updateChunk(index: index + 1)
+            // 大文件加载完成后自动触发格式化
+            if autoFormat {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    jsonProcessor.processJSON(sortKeys: sortKeys)
                 }
             }
-            
-            updateChunk(index: 0)
         }
     }
     
