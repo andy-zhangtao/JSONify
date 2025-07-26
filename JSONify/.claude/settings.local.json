@@ -30,7 +30,10 @@
       "Bash(git restore:*)",
       "Bash(git reset:*)",
       "Bash(git merge:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git branch:*)",
+      "Bash(security find-identity:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

@@ -118,6 +118,27 @@ class JSONProcessor: ObservableObject {
         }
     }
     
+    func convertUnicodeToChineseCharacters() {
+        let converted = convertUnicodeSequences(inputText)
+        DispatchQueue.main.async {
+            self.inputText = converted
+        }
+    }
+    
+    func convertHTMLToChineseCharacters() {
+        let converted = convertHTMLEntities(inputText)
+        DispatchQueue.main.async {
+            self.inputText = converted
+        }
+    }
+    
+    func convertURLEncoding() {
+        let converted = convertURLEncodedString(inputText)
+        DispatchQueue.main.async {
+            self.inputText = converted
+        }
+    }
+    
     private func unescapeString(_ input: String) -> String {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -139,6 +160,114 @@ class JSONProcessor: ObservableObject {
         }
         
         return trimmed
+    }
+    
+    private func convertUnicodeSequences(_ input: String) -> String {
+        var result = input
+        
+        // 匹配 \uXXXX 格式的Unicode序列
+        let unicodePattern = #"\\u([0-9a-fA-F]{4})"#
+        
+        do {
+            let regex = try NSRegularExpression(pattern: unicodePattern, options: [])
+            let matches = regex.matches(in: result, options: [], range: NSRange(location: 0, length: result.count))
+            
+            // 从后往前替换，避免索引偏移问题
+            for match in matches.reversed() {
+                if let unicodeRange = Range(match.range(at: 1), in: result),
+                   let fullRange = Range(match.range, in: result) {
+                    let unicodeHex = String(result[unicodeRange])
+                    if let unicodeValue = UInt32(unicodeHex, radix: 16),
+                       let scalar = UnicodeScalar(unicodeValue) {
+                        let character = String(Character(scalar))
+                        result.replaceSubrange(fullRange, with: character)
+                    }
+                }
+            }
+        } catch {
+            // 如果正则表达式失败，返回原字符串
+            return input
+        }
+        
+        return result
+    }
+    
+    private func convertHTMLEntities(_ input: String) -> String {
+        var result = input
+        
+        // HTML实体映射表
+        let htmlEntities: [String: String] = [
+            "&amp;": "&",
+            "&lt;": "<",
+            "&gt;": ">",
+            "&quot;": "\"",
+            "&apos;": "'",
+            "&nbsp;": " ",
+            "&#39;": "'",
+            "&#34;": "\"",
+            "&#38;": "&",
+            "&#60;": "<",
+            "&#62;": ">",
+            "&#160;": " "
+        ]
+        
+        // 替换命名实体
+        for (entity, replacement) in htmlEntities {
+            result = result.replacingOccurrences(of: entity, with: replacement)
+        }
+        
+        // 处理数字实体 &#数字; 格式
+        let numericPattern = #"&#(\d+);"#
+        do {
+            let regex = try NSRegularExpression(pattern: numericPattern, options: [])
+            let matches = regex.matches(in: result, options: [], range: NSRange(location: 0, length: result.count))
+            
+            for match in matches.reversed() {
+                if let numberRange = Range(match.range(at: 1), in: result),
+                   let fullRange = Range(match.range, in: result) {
+                    let numberString = String(result[numberRange])
+                    if let number = UInt32(numberString),
+                       let scalar = UnicodeScalar(number) {
+                        let character = String(Character(scalar))
+                        result.replaceSubrange(fullRange, with: character)
+                    }
+                }
+            }
+        } catch {
+            // 如果正则表达式失败，返回原字符串
+            return input
+        }
+        
+        // 处理十六进制实体 &#x十六进制; 格式
+        let hexPattern = #"&#x([0-9a-fA-F]+);"#
+        do {
+            let regex = try NSRegularExpression(pattern: hexPattern, options: [])
+            let matches = regex.matches(in: result, options: [], range: NSRange(location: 0, length: result.count))
+            
+            for match in matches.reversed() {
+                if let hexRange = Range(match.range(at: 1), in: result),
+                   let fullRange = Range(match.range, in: result) {
+                    let hexString = String(result[hexRange])
+                    if let number = UInt32(hexString, radix: 16),
+                       let scalar = UnicodeScalar(number) {
+                        let character = String(Character(scalar))
+                        result.replaceSubrange(fullRange, with: character)
+                    }
+                }
+            }
+        } catch {
+            return input
+        }
+        
+        return result
+    }
+    
+    private func convertURLEncodedString(_ input: String) -> String {
+        // 使用 Foundation 的 URL 解码功能
+        guard let decoded = input.removingPercentEncoding else {
+            return input
+        }
+        return decoded
     }
     
     private func parseJSONError(error: Error) -> JSONValidationError {
