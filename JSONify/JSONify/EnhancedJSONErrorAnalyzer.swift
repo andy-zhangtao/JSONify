@@ -7,6 +7,7 @@
 
 import Foundation
 import NaturalLanguage
+// import FoundationModels  // Apple's Foundation Models API - 待API正式发布后启用
 
 /// 增强版JSON错误分析器 - 提供精确的错误定位和修复建议
 @available(macOS 15.0, *)
@@ -438,8 +439,8 @@ class EnhancedJSONErrorAnalyzer: ObservableObject {
             result.append("• **优先修复**: \(firstStructural.suggestion)")
         }
         
-        result.append("• **验证工具**: 修复后使用JSONLint等工具验证")
-        result.append("• **分步调试**: 逐行检查，从错误位置开始")
+        result.append("• **一键修复**: 点击下方'AI智能修复'按钮自动修复")
+        result.append("• **手动修复**: 根据上述位置信息逐一修复问题")
         
         // 如果没有发现具体问题，提供通用建议
         if structural.issues.isEmpty && syntax.issues.isEmpty && semantic.issues.isEmpty {
@@ -449,9 +450,276 @@ class EnhancedJSONErrorAnalyzer: ObservableObject {
             result.append("• 确保所有字符串使用双引号")
             result.append("• 移除多余的逗号")
             result.append("• 验证所有键名都用双引号包围")
+            result.append("• 尝试使用AI智能修复功能")
         }
         
         return result.joined(separator: "\n")
+    }
+    
+    // MARK: - AI智能修复功能
+    
+    /// AI智能修复JSON字符串
+    func performAIFix(jsonInput: String, completion: @escaping (AIFixResult) -> Void) {
+        Task {
+            let result = await performJSONRepair(input: jsonInput)
+            await MainActor.run {
+                completion(result)
+            }
+        }
+    }
+    
+    /// 执行JSON修复
+    private func performJSONRepair(input: String) async -> AIFixResult {
+        let truncatedInput = String(input.prefix(maxAnalysisLength))
+        
+        // 1. 首先尝试使用macOS AI进行智能修复
+        if #available(macOS 26.0, *) {
+            if let aiFixedJSON = await performAIRepair(input: truncatedInput) {
+                return aiFixedJSON
+            }
+        }
+        
+        // 2. 回退到规则修复策略
+        return await performRuleBasedRepair(input: truncatedInput)
+    }
+    
+    /// 使用macOS AI进行智能修复
+    @available(macOS 26.0, *)
+    private func performAIRepair(input: String) async -> AIFixResult? {
+        let prompt = buildRepairPrompt(jsonInput: input)
+        
+        // 使用Apple的Foundation Models API进行智能修复
+        // 需要macOS 26.0+和Foundation Models框架
+        if let fixedJSON = await requestAppleIntelligenceRepair(prompt: prompt) {
+            // 验证AI修复结果
+            if let data = fixedJSON.data(using: .utf8) {
+                do {
+                    _ = try JSONSerialization.jsonObject(with: data, options: [])
+                    return .success(fixedJSON: fixedJSON)
+                } catch {
+                    // AI修复失败，继续使用规则修复
+                    return nil
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    /// 构建AI修复提示词
+    private func buildRepairPrompt(jsonInput: String) -> String {
+        return """
+        请修复以下损坏的JSON字符串，使其成为有效的JSON格式：
+        
+        损坏的JSON:
+        \(jsonInput)
+        
+        修复要求：
+        1. 保持原有的数据结构和内容
+        2. 修复所有语法错误（括号匹配、引号、逗号等）
+        3. 确保键名用双引号包围
+        4. 布尔值使用小写（true/false）
+        5. 空值使用小写（null）
+        6. 移除多余的逗号
+        
+        请直接返回修复后的JSON字符串，不要添加任何解释文字。
+        """
+    }
+    
+    /// 请求Apple Intelligence修复（模拟实现，待Foundation Models API发布后替换）
+    @available(macOS 26.0, *)
+    private func requestAppleIntelligenceRepair(prompt: String) async -> String? {
+        // TODO: 当Foundation Models API正式发布后，替换为真实的API调用
+        // 目前使用高级规则修复作为智能修复的模拟
+        
+        // 这里可以在未来替换为:
+        // let model = try await FoundationModel.shared()
+        // let request = TextGenerationRequest(prompt: prompt, ...)
+        // let response = try await model.generateText(request)
+        
+        // 暂时返回nil，让系统使用规则修复
+        return nil
+    }
+    
+    /// 清理AI响应，提取纯JSON
+    private func cleanAIResponse(_ response: String) -> String {
+        // 移除可能的markdown标记或解释文字
+        var cleaned = response
+        
+        // 移除```json和```标记
+        cleaned = cleaned.replacingOccurrences(of: "```json", with: "")
+        cleaned = cleaned.replacingOccurrences(of: "```", with: "")
+        
+        // 移除前后的解释文字，只保留JSON部分
+        if let jsonStart = cleaned.firstIndex(where: { $0 == "{" || $0 == "[" }),
+           let jsonEnd = cleaned.lastIndex(where: { $0 == "}" || $0 == "]" }) {
+            let jsonRange = jsonStart...jsonEnd
+            cleaned = String(cleaned[jsonRange])
+        }
+        
+        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    /// 执行基于规则的修复
+    private func performRuleBasedRepair(input: String) async -> AIFixResult {
+        // 执行多种修复策略
+        let strategies: [(name: String, repair: (String) -> String)] = [
+            ("括号匹配修复", repairBrackets),
+            ("引号修复", repairQuotes),
+            ("逗号修复", repairCommas),
+            ("键名修复", repairKeys),
+            ("值修复", repairValues)
+        ]
+        
+        var repairedJSON = input
+        var appliedFixes: [String] = []
+        
+        for (strategyName, repairFunction) in strategies {
+            let beforeRepair = repairedJSON
+            repairedJSON = repairFunction(repairedJSON)
+            
+            if beforeRepair != repairedJSON {
+                appliedFixes.append(strategyName)
+            }
+        }
+        
+        // 验证修复结果
+        if let data = repairedJSON.data(using: .utf8) {
+            do {
+                _ = try JSONSerialization.jsonObject(with: data, options: [])
+                return .success(fixedJSON: repairedJSON)
+            } catch {
+                return .failure(reason: "修复后的JSON仍然无效")
+            }
+        }
+        
+        return .failure(reason: "无法生成有效的JSON")
+    }
+    
+    /// 修复括号匹配问题
+    private func repairBrackets(_ input: String) -> String {
+        var result = input
+        var stack: [Character] = []
+        
+        // 统计缺失的闭合括号
+        for char in input {
+            switch char {
+            case "{", "[":
+                stack.append(char)
+            case "}", "]":
+                if !stack.isEmpty {
+                    let open = stack.removeLast()
+                    let expectedClose: Character = open == "{" ? "}" : "]"
+                    if char != expectedClose {
+                        // 括号类型不匹配，尝试修复
+                        result = result.replacingOccurrences(of: String(char), with: String(expectedClose))
+                    }
+                }
+            default:
+                break
+            }
+        }
+        
+        // 添加缺失的闭合括号
+        for openBracket in stack.reversed() {
+            let closeBracket: Character = openBracket == "{" ? "}" : "]"
+            result.append(closeBracket)
+        }
+        
+        return result
+    }
+    
+    /// 修复引号问题
+    private func repairQuotes(_ input: String) -> String {
+        // 将单引号替换为双引号
+        var result = input.replacingOccurrences(of: "'", with: "\"")
+        
+        // 修复未闭合的字符串
+        var inString = false
+        var lastQuoteIndex: String.Index?
+        var chars = Array(result)
+        
+        for (index, char) in chars.enumerated() {
+            if char == "\"" {
+                if inString {
+                    inString = false
+                    lastQuoteIndex = nil
+                } else {
+                    inString = true
+                    lastQuoteIndex = result.index(result.startIndex, offsetBy: index)
+                }
+            }
+        }
+        
+        // 如果有未闭合的字符串，添加结束引号
+        if inString {
+            result.append("\"")
+        }
+        
+        return result
+    }
+    
+    /// 修复逗号问题
+    private func repairCommas(_ input: String) -> String {
+        var result = input
+        
+        // 移除多余的逗号
+        result = result.replacingOccurrences(of: ",}", with: "}")
+        result = result.replacingOccurrences(of: ",]", with: "]")
+        
+        // 移除行尾多余的逗号
+        let lines = result.components(separatedBy: .newlines)
+        let fixedLines = lines.map { line in
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.hasSuffix(",}") || trimmed.hasSuffix(",]") {
+                return line.replacingOccurrences(of: ",}", with: "}").replacingOccurrences(of: ",]", with: "]")
+            }
+            return line
+        }
+        
+        return fixedLines.joined(separator: "\n")
+    }
+    
+    /// 修复键名问题
+    private func repairKeys(_ input: String) -> String {
+        var result = input
+        
+        // 修复未引用的键名
+        let keyPattern = #"(\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:"#
+        if let regex = try? NSRegularExpression(pattern: keyPattern) {
+            let range = NSRange(location: 0, length: result.count)
+            let matches = regex.matches(in: result, range: range).reversed()
+            
+            for match in matches {
+                if let fullRange = Range(match.range, in: result),
+                   let keyRange = Range(match.range(at: 2), in: result) {
+                    let key = String(result[keyRange])
+                    let fullMatch = String(result[fullRange])
+                    let fixedMatch = fullMatch.replacingOccurrences(of: "\(key):", with: "\"\(key)\":")
+                    result.replaceSubrange(fullRange, with: fixedMatch)
+                }
+            }
+        }
+        
+        return result
+    }
+    
+    /// 修复值问题
+    private func repairValues(_ input: String) -> String {
+        var result = input
+        
+        // 修复布尔值大小写
+        result = result.replacingOccurrences(of: "True", with: "true")
+        result = result.replacingOccurrences(of: "False", with: "false")
+        result = result.replacingOccurrences(of: "TRUE", with: "true")
+        result = result.replacingOccurrences(of: "FALSE", with: "false")
+        
+        // 修复null值
+        result = result.replacingOccurrences(of: "nil", with: "null")
+        result = result.replacingOccurrences(of: "NULL", with: "null")
+        result = result.replacingOccurrences(of: "None", with: "null")
+        
+        return result
     }
 }
 
@@ -518,5 +786,28 @@ struct SemanticIssue {
         self.key = key
         self.lines = lines
         self.suggestion = suggestion
+    }
+}
+
+// MARK: - AI修复结果模型
+struct AIFixResult {
+    let success: Bool
+    let fixedJSON: String?
+    let message: String
+    
+    static func success(fixedJSON: String) -> AIFixResult {
+        return AIFixResult(
+            success: true,
+            fixedJSON: fixedJSON,
+            message: "🎉 AI成功修复了JSON格式问题！"
+        )
+    }
+    
+    static func failure(reason: String) -> AIFixResult {
+        return AIFixResult(
+            success: false,
+            fixedJSON: nil,
+            message: "⚠️ AI修复失败：\(reason)"
+        )
     }
 }

@@ -11,6 +11,7 @@ struct AIErrorSuggestionView: View {
     let suggestion: String
     let isAnalyzing: Bool
     let onDismiss: () -> Void
+    let onAIRepair: (() -> Void)?
     
     @State private var isExpanded = false
     
@@ -145,6 +146,18 @@ struct AIErrorSuggestionView: View {
                     }
                     .buttonStyle(EnhancedButtonStyle(variant: .secondary))
                     
+                    // AI智能修复按钮
+                    if let onAIRepair = onAIRepair {
+                        Button(action: onAIRepair) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "wand.and.stars")
+                                Text("AI智能修复")
+                            }
+                            .font(.caption)
+                        }
+                        .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                    }
+                    
                     Spacer()
                     
                     Text("由macOS AI提供支持")
@@ -276,13 +289,15 @@ struct AIErrorSuggestionView_Previews: PreviewProvider {
                 • 逐步删除内容定位具体错误位置
                 """,
                 isAnalyzing: false,
-                onDismiss: {}
+                onDismiss: {},
+                onAIRepair: {}
             )
             
             AIErrorSuggestionView(
                 suggestion: "",
                 isAnalyzing: true,
-                onDismiss: {}
+                onDismiss: {},
+                onAIRepair: nil
             )
         }
         .padding()

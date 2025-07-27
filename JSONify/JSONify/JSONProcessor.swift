@@ -156,6 +156,9 @@ class JSONProcessor: ObservableObject {
                         self.isProcessing = false
                         self.processingProgress = 1.0
                         self.processingStatus = "处理完成"
+                        
+                        // JSON合法时清空AI错误提示
+                        self.clearAIErrorSuggestion()
                     }
                 }
             } else {
@@ -604,5 +607,30 @@ class JSONProcessor: ObservableObject {
     func clearAIErrorSuggestion() {
         aiErrorSuggestion = nil
         isAIAnalyzing = false
+    }
+    
+    /// AI智能修复JSON
+    func performAIJSONRepair() {
+        if #available(macOS 15.0, *) {
+            isAIAnalyzing = true
+            
+            enhancedAnalyzer.performAIFix(jsonInput: inputText) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isAIAnalyzing = false
+                    
+                    if result.success, let fixedJSON = result.fixedJSON {
+                        // 修复成功，更新输入内容
+                        self?.inputText = fixedJSON
+                        self?.clearAIErrorSuggestion()
+                        
+                        // 重新处理JSON
+                        self?.processJSON()
+                    } else {
+                        // 修复失败，显示错误信息
+                        self?.aiErrorSuggestion = result.message
+                    }
+                }
+            }
+        }
     }
 }

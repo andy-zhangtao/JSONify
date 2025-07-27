@@ -203,6 +203,9 @@ extension ContentView {
                     isAnalyzing: jsonProcessor.isAIAnalyzing,
                     onDismiss: {
                         jsonProcessor.clearAIErrorSuggestion()
+                    },
+                    onAIRepair: {
+                        jsonProcessor.performAIJSONRepair()
                     }
                 )
                 .pageTransition(isActive: jsonProcessor.isAIAnalyzing || jsonProcessor.aiErrorSuggestion != nil)
