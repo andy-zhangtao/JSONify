@@ -189,10 +189,23 @@ extension ContentView {
     }
     
     private var inputErrorView: some View {
-        Group {
+        VStack(spacing: 12) {
+            // 原始错误信息
             if let error = jsonProcessor.validationError {
                 InfoBubble(text: error.localizedDescription, type: .error)
                     .pageTransition(isActive: jsonProcessor.validationError != nil)
+            }
+            
+            // AI错误建议
+            if jsonProcessor.isAIAnalyzing || (jsonProcessor.aiErrorSuggestion != nil && !jsonProcessor.aiErrorSuggestion!.isEmpty) {
+                AIErrorSuggestionView(
+                    suggestion: jsonProcessor.aiErrorSuggestion ?? "",
+                    isAnalyzing: jsonProcessor.isAIAnalyzing,
+                    onDismiss: {
+                        jsonProcessor.clearAIErrorSuggestion()
+                    }
+                )
+                .pageTransition(isActive: jsonProcessor.isAIAnalyzing || jsonProcessor.aiErrorSuggestion != nil)
             }
         }
     }

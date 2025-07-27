@@ -1,4 +1,5 @@
 import Foundation
+import NaturalLanguage
 
 enum JSONValidationError: Error, Equatable {
     case invalidJSON(message: String, line: Int?, column: Int?)
@@ -27,11 +28,17 @@ class JSONProcessor: ObservableObject {
     @Published var isProcessing: Bool = false
     @Published var processingProgress: Double = 0.0
     @Published var processingStatus: String = ""
+    @Published var aiErrorSuggestion: String?
+    @Published var isAIAnalyzing: Bool = false
     
     // TODO: 将来可以添加JSONHealer支持
     private var debounceTimer: Timer?
     private var processingTask: Task<Void, Never>?
     private var encodingConversionTimer: Timer?
+    
+    // AI错误分析器
+    @available(macOS 15.0, *)
+    private lazy var aiErrorAnalyzer = AIErrorAnalyzer()
     
     deinit {
         debounceTimer?.invalidate()
@@ -153,18 +160,24 @@ class JSONProcessor: ObservableObject {
             
         } catch {
             let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            let jsonError: JSONValidationError
+            if let validationError = error as? JSONValidationError {
+                jsonError = validationError
+            } else {
+                jsonError = self.parseJSONError(error: error)
+            }
+            
             DispatchQueue.main.async {
-                if let jsonError = error as? JSONValidationError {
-                    self.validationError = jsonError
-                } else {
-                    self.validationError = self.parseJSONError(error: error)
-                }
+                self.validationError = jsonError
                 self.isValid = false
                 self.formattedJSON = ""
                 self.processingTime = timeElapsed
                 self.isProcessing = false
                 self.processingProgress = 0.0
                 self.processingStatus = ""
+                
+                // 启动AI错误分析
+                self.performAIErrorAnalysis(jsonInput: self.inputText, error: jsonError)
             }
         }
     }
@@ -234,7 +247,9 @@ class JSONProcessor: ObservableObject {
         let debounceDelay: TimeInterval = inputLength > 50000 ? 0.8 : (inputLength > 10000 ? 0.5 : 0.2)
         
         encodingConversionTimer = Timer.scheduledTimer(withTimeInterval: debounceDelay, repeats: false) { _ in
-            self.performAsyncEncodingConversion(type: type, converter: converter)
+            Task {
+                await self.performAsyncEncodingConversion(type: type, converter: converter)
+            }
         }
     }
     
@@ -530,5 +545,59 @@ class JSONProcessor: ObservableObject {
         }
         
         return JSONValidationError.invalidJSON(message: "JSON解析失败: \(errorString)", line: nil, column: nil)
+    }
+    
+    // MARK: - AI错误分析
+    
+    /// 执行AI错误分析
+    private func performAIErrorAnalysis(jsonInput: String, error: JSONValidationError) {
+        // 检查系统版本和功能可用性
+        if #available(macOS 15.0, *) {
+            isAIAnalyzing = true
+            aiErrorSuggestion = nil
+            
+            aiErrorAnalyzer.analyzeJSONError(jsonInput: jsonInput, error: error) { [weak self] suggestion in
+                DispatchQueue.main.async {
+                    self?.aiErrorSuggestion = suggestion
+                    self?.isAIAnalyzing = false
+                }
+            }
+        } else {
+            // 系统版本不支持AI分析，提供基础建议
+            aiErrorSuggestion = generateBasicErrorSuggestion(error: error)
+            isAIAnalyzing = false
+        }
+    }
+    
+    /// 为不支持AI的系统生成基础错误建议
+    private func generateBasicErrorSuggestion(error: JSONValidationError) -> String {
+        switch error {
+        case .invalidJSON(let message, let line, let column):
+            var suggestion = "🔧 **JSON格式错误**\n\n"
+            suggestion += "错误信息：\(message)\n\n"
+            
+            if let line = line, let column = column {
+                suggestion += "📍 错误位置：第 \(line) 行，第 \(column) 列\n\n"
+            }
+            
+            suggestion += "💡 **常见解决方案**:\n"
+            suggestion += "• 检查大括号 {} 和方括号 [] 是否配对\n"
+            suggestion += "• 确保所有字符串用双引号包围\n"
+            suggestion += "• 移除多余的逗号\n"
+            suggestion += "• 确保键名和字符串值都用双引号\n"
+            suggestion += "• 检查布尔值是否为小写 (true/false)\n"
+            suggestion += "• 检查空值是否为小写 (null)"
+            
+            return suggestion
+            
+        case .emptyInput:
+            return "📝 请输入要格式化的JSON数据"
+        }
+    }
+    
+    /// 清除AI错误建议
+    func clearAIErrorSuggestion() {
+        aiErrorSuggestion = nil
+        isAIAnalyzing = false
     }
 }
