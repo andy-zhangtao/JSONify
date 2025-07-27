@@ -40,6 +40,10 @@ class JSONProcessor: ObservableObject {
     @available(macOS 15.0, *)
     private lazy var aiErrorAnalyzer = AIErrorAnalyzer()
     
+    // 增强版AI错误分析器
+    @available(macOS 15.0, *)
+    private lazy var enhancedAnalyzer = EnhancedJSONErrorAnalyzer()
+    
     deinit {
         debounceTimer?.invalidate()
         encodingConversionTimer?.invalidate()
@@ -556,7 +560,8 @@ class JSONProcessor: ObservableObject {
             isAIAnalyzing = true
             aiErrorSuggestion = nil
             
-            aiErrorAnalyzer.analyzeJSONError(jsonInput: jsonInput, error: error) { [weak self] suggestion in
+            // 使用增强版分析器提供更精确的分析
+            enhancedAnalyzer.analyzeJSONError(jsonInput: jsonInput, error: error) { [weak self] suggestion in
                 DispatchQueue.main.async {
                     self?.aiErrorSuggestion = suggestion
                     self?.isAIAnalyzing = false
