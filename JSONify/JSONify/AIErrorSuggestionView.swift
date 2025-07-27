@@ -12,9 +12,10 @@ struct AIErrorSuggestionView: View {
     let isAnalyzing: Bool
     let onDismiss: () -> Void
     
-    @EnvironmentObject private var themeManager: ThemeManager
-    @EnvironmentObject private var animationManager: AnimationManager
     @State private var isExpanded = false
+    
+    // 直接使用AnimationManager.shared避免环境依赖问题
+    private let animationManager = AnimationManager.shared
     
     var body: some View {
         VStack(spacing: 0) {
@@ -24,8 +25,8 @@ struct AIErrorSuggestionView: View {
                 suggestionView
             }
         }
-        .animation(animationManager.smooth, value: isAnalyzing)
-        .animation(animationManager.smooth, value: suggestion)
+        .animation(.easeInOut(duration: 0.3), value: isAnalyzing)
+        .animation(.easeInOut(duration: 0.3), value: suggestion)
     }
     
     private var analyzingView: some View {
@@ -91,7 +92,7 @@ struct AIErrorSuggestionView: View {
                 HStack(spacing: 8) {
                     // 展开/收起按钮
                     Button(action: {
-                        withAnimation(animationManager.smooth) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
                             isExpanded.toggle()
                         }
                     }) {
@@ -160,7 +161,7 @@ struct AIErrorSuggestionView: View {
         )
         .onAppear {
             // 默认展开显示详细建议
-            withAnimation(animationManager.smooth.delay(0.3)) {
+            withAnimation(.easeInOut(duration: 0.3).delay(0.3)) {
                 isExpanded = true
             }
         }
@@ -285,7 +286,5 @@ struct AIErrorSuggestionView_Previews: PreviewProvider {
             )
         }
         .padding()
-        .environmentObject(ThemeManager())
-        .environmentObject(AnimationManager.shared)
     }
 }
