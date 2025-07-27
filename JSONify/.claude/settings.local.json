@@ -35,7 +35,10 @@
       "Bash(security find-identity:*)",
       "Bash(find:*)",
       "Bash(sed:*)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(hdiutil create:*)",
+      "Bash(git fetch:*)",
+      "Bash(sw_vers)"
     ],
     "deny": []
   }
