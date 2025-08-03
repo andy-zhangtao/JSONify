@@ -202,25 +202,23 @@ extension ContentView {
             if !jsonProcessor.inputText.isEmpty {
                 VStack(spacing: 12) {
                     // 第一行：主要功能按钮
-                    HStack(spacing: 12) {
+                    HStack(spacing: 8) {
                         if !autoFormat {
-                            Button(action: performManualFormat) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "play.fill")
-                                    Text("格式化 JSON")
-                                }
-                            }
-                            .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                            SimpleIconButton(
+                                icon: "play.fill",
+                                tooltip: "格式化 JSON",
+                                variant: .primary,
+                                action: performManualFormat
+                            )
                             .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
                         }
                         
-                        Button(action: performUnescape) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "arrow.up.left.and.down.right.and.arrow.up.right.and.down.left")
-                                Text("反转义")
-                            }
-                        }
-                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        SimpleIconButton(
+                            icon: "arrow.up.left.and.down.right.and.arrow.up.right.and.down.left",
+                            tooltip: "反转义 JSON 字符串",
+                            variant: .secondary,
+                            action: performUnescape
+                        )
                         .animatedScale(trigger: !jsonProcessor.inputText.isEmpty)
                         
                         Spacer()
@@ -228,31 +226,28 @@ extension ContentView {
                     
                     // 第二行：编码转换功能按钮
                     HStack(spacing: 8) {
-                        Button(action: performUnicodeConversion) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "textformat.123")
-                                Text("Unicode转中文")
-                            }
-                        }
-                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        CompactIconButton(
+                            icon: "textformat.123",
+                            tooltip: "Unicode转中文",
+                            variant: .secondary,
+                            action: performUnicodeConversion
+                        )
                         .animatedScale(trigger: !jsonProcessor.inputText.isEmpty, scale: 0.98)
                         
-                        Button(action: performHTMLConversion) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "doc.richtext")
-                                Text("HTML转中文")
-                            }
-                        }
-                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        CompactIconButton(
+                            icon: "doc.richtext",
+                            tooltip: "HTML转中文",
+                            variant: .secondary,
+                            action: performHTMLConversion
+                        )
                         .animatedScale(trigger: !jsonProcessor.inputText.isEmpty, scale: 0.98)
                         
-                        Button(action: performURLDecoding) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "link.badge.plus")
-                                Text("URL解码")
-                            }
-                        }
-                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        CompactIconButton(
+                            icon: "link.badge.plus",
+                            tooltip: "URL解码",
+                            variant: .secondary,
+                            action: performURLDecoding
+                        )
                         .animatedScale(trigger: !jsonProcessor.inputText.isEmpty, scale: 0.98)
                         
                         Spacer()
@@ -266,15 +261,14 @@ extension ContentView {
     private var fileSelectionView: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
-                Button(action: {
-                    fileManager.presentFilePicker()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "folder.badge.plus")
-                        Text("选择文件")
+                IconButton(
+                    icon: "folder.badge.plus",
+                    tooltip: "选择文件",
+                    variant: .primary,
+                    action: {
+                        fileManager.presentFilePicker()
                     }
-                }
-                .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                )
                 .animatedScale(trigger: true)
                 
                 if fileManager.isLoading {
@@ -289,16 +283,14 @@ extension ContentView {
                 }
                 
                 if !fileManager.selectedFileName.isEmpty {
-                    Button(action: {
-                        fileManager.clearSelection()
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.red)
-                            Text("清除选择")
+                    CompactIconButton(
+                        icon: "xmark.circle.fill",
+                        tooltip: "清除选择",
+                        variant: .danger,
+                        action: {
+                            fileManager.clearSelection()
                         }
-                    }
-                    .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                    )
                     .animatedScale(trigger: !fileManager.selectedFileName.isEmpty, scale: 0.98)
                 }
                 
@@ -337,14 +329,14 @@ extension ContentView {
                         
                         Spacer()
                         
-                        Button(action: {
-                            fileManager.clearRecentFiles()
-                        }) {
-                            Text("清空")
-                                .font(.caption)
-                                .foregroundColor(.red)
-                        }
-                        .buttonStyle(.plain)
+                        CompactIconButton(
+                            icon: "trash",
+                            tooltip: "清空最近文件",
+                            variant: .danger,
+                            action: {
+                                fileManager.clearRecentFiles()
+                            }
+                        )
                     }
                     
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -381,11 +373,12 @@ extension ContentView {
                         
                         Spacer()
                         
-                        Button(action: clearHistory) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                        }
-                        .buttonStyle(.plain)
+                        CompactIconButton(
+                            icon: "trash",
+                            tooltip: "清空历史记录",
+                            variant: .danger,
+                            action: clearHistory
+                        )
                     }
                     
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -457,13 +450,12 @@ extension ContentView {
                     )
                     .frame(width: 200)
                     
-                    Button(action: copyToClipboard) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "doc.on.doc")
-                            Text("复制")
-                        }
-                    }
-                    .buttonStyle(EnhancedButtonStyle(variant: .primary))
+                    IconButton(
+                        icon: "doc.on.doc",
+                        tooltip: "复制格式化的 JSON",
+                        variant: .primary,
+                        action: copyToClipboard
+                    )
                     .animatedScale(trigger: jsonProcessor.isValid)
                 }
                 .pageTransition(isActive: jsonProcessor.isValid)

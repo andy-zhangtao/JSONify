@@ -27,20 +27,24 @@ struct JSONPathQueryView: View {
                 Spacer()
                 
                 // 帮助按钮
-                Button(action: { showingHelp.toggle() }) {
-                    Label("语法帮助", systemImage: "questionmark.circle")
-                }
-                .buttonStyle(.borderless)
+                CompactIconButton(
+                    icon: "questionmark.circle",
+                    tooltip: "语法帮助",
+                    variant: .secondary,
+                    action: { showingHelp.toggle() }
+                )
                 .popover(isPresented: $showingHelp) {
                     JSONPathHelpView()
                         .frame(width: 400, height: 500)
                 }
                 
                 // 查询按钮
-                Button(action: performQuery) {
-                    Label("查询", systemImage: "magnifyingglass")
-                }
-                .buttonStyle(.borderedProminent)
+                IconButton(
+                    icon: "magnifyingglass",
+                    tooltip: "执行 JSONPath 查询",
+                    variant: .primary,
+                    action: performQuery
+                )
                 .disabled(jsonProcessor.inputText.isEmpty || pathQuery.isEmpty)
             }
             .padding(.horizontal, 20)
@@ -120,11 +124,12 @@ struct JSONPathQueryView: View {
                                         performQuery()
                                     }
                                 
-                                Button(action: { pathQuery = "" }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.secondary)
-                                }
-                                .buttonStyle(.borderless)
+                                CompactIconButton(
+                                    icon: "xmark.circle.fill",
+                                    tooltip: "清空查询",
+                                    variant: .secondary,
+                                    action: { pathQuery = "" }
+                                )
                                 .opacity(pathQuery.isEmpty ? 0 : 1)
                             }
                             
@@ -283,26 +288,25 @@ struct EnhancedJSONPathResultRow: View {
                 // 操作按钮
                 HStack(spacing: 8) {
                     if canExpand {
-                        Button(action: {
-                            withAnimation(animationManager.spring) {
-                                isExpanded.toggle()
+                        CompactIconButton(
+                            icon: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill",
+                            tooltip: isExpanded ? "收起" : "展开",
+                            variant: .secondary,
+                            action: {
+                                withAnimation(animationManager.spring) {
+                                    isExpanded.toggle()
+                                }
                             }
-                        }) {
-                            Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
-                                .font(.body)
-                                .foregroundColor(.blue)
-                        }
-                        .buttonStyle(.plain)
+                        )
                         .animatedScale(trigger: isExpanded)
                     }
                     
-                    Button(action: copyPath) {
-                        Image(systemName: "doc.on.doc.fill")
-                            .font(.body)
-                            .foregroundColor(.green)
-                    }
-                    .buttonStyle(.plain)
-                    .help("复制路径")
+                    CompactIconButton(
+                        icon: "doc.on.doc.fill",
+                        tooltip: "复制结果",
+                        variant: .success,
+                        action: copyPath
+                    )
                     .animatedScale(trigger: isHovered)
                 }
             }
@@ -446,17 +450,17 @@ struct JSONPathHelpView: View {
                                 
                                 Spacer()
                                 
-                                Button(action: {
-                                    // 复制示例到剪贴板
-                                    let pasteboard = NSPasteboard.general
-                                    pasteboard.declareTypes([.string], owner: nil)
-                                    pasteboard.setString(example.syntax, forType: .string)
-                                }) {
-                                    Image(systemName: "doc.on.doc")
-                                        .font(.caption)
-                                }
-                                .buttonStyle(.plain)
-                                .help("复制示例")
+                                CompactIconButton(
+                                    icon: "doc.on.doc",
+                                    tooltip: "复制示例",
+                                    variant: .secondary,
+                                    action: {
+                                        // 复制示例到剪贴板
+                                        let pasteboard = NSPasteboard.general
+                                        pasteboard.declareTypes([.string], owner: nil)
+                                        pasteboard.setString(example.syntax, forType: .string)
+                                    }
+                                )
                             }
                         }
                         .pageTransition(isActive: true)

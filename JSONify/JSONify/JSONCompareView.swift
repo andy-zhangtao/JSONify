@@ -39,17 +39,16 @@ struct JSONCompareView: View {
                     
                     HStack(spacing: 12) {
                         // 比较选项
-                        Button(action: { 
-                            withAnimation(animationManager.spring) {
-                                showingOptions.toggle()
+                        CompactIconButton(
+                            icon: "gear",
+                            tooltip: "比较选项",
+                            variant: .secondary,
+                            action: { 
+                                withAnimation(animationManager.spring) {
+                                    showingOptions.toggle()
+                                }
                             }
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "gear")
-                                Text("选项")
-                            }
-                        }
-                        .buttonStyle(EnhancedButtonStyle(variant: .secondary))
+                        )
                         .animatedScale(trigger: showingOptions)
                         .popover(isPresented: $showingOptions) {
                             CompareOptionsView(options: $compareOptions)
@@ -58,21 +57,24 @@ struct JSONCompareView: View {
                         }
                         
                         // 比较按钮
-                        Button(action: performComparison) {
+                        if isComparing {
                             HStack(spacing: 8) {
-                                if isComparing {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                    Text("比较中...")
-                                } else {
-                                    Image(systemName: "arrow.triangle.2.circlepath")
-                                    Text("开始比较")
-                                }
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("比较中...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
                             }
+                        } else {
+                            IconButton(
+                                icon: "arrow.triangle.2.circlepath",
+                                tooltip: "开始比较 JSON",
+                                variant: .primary,
+                                action: performComparison
+                            )
+                            .disabled(leftProcessor.inputText.isEmpty || rightProcessor.inputText.isEmpty || isComparing)
+                            .animatedScale(trigger: !leftProcessor.inputText.isEmpty && !rightProcessor.inputText.isEmpty)
                         }
-                        .buttonStyle(EnhancedButtonStyle(variant: .primary))
-                        .disabled(leftProcessor.inputText.isEmpty || rightProcessor.inputText.isEmpty || isComparing)
-                        .animatedScale(trigger: !leftProcessor.inputText.isEmpty && !rightProcessor.inputText.isEmpty)
                     }
                 }
             }
