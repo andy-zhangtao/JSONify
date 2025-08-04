@@ -27,11 +27,14 @@ class JSONProcessor: ObservableObject {
     @Published var isProcessing: Bool = false
     @Published var processingProgress: Double = 0.0
     @Published var processingStatus: String = ""
+    @Published var isHealingAvailable: Bool = false
+    @Published var isHealing: Bool = false
     
-    // TODO: 将来可以添加JSONHealer支持
     private var debounceTimer: Timer?
     private var processingTask: Task<Void, Never>?
     private var encodingConversionTimer: Timer?
+    private let openRouterService = OpenRouterService()
+    private let openRouterManager = OpenRouterManager()
     
     deinit {
         debounceTimer?.invalidate()
@@ -165,6 +168,9 @@ class JSONProcessor: ObservableObject {
                 self.isProcessing = false
                 self.processingProgress = 0.0
                 self.processingStatus = ""
+                
+                // 检查是否可以进行AI修复
+                self.isHealingAvailable = self.openRouterManager.isConfigured
             }
         }
     }
@@ -187,6 +193,53 @@ class JSONProcessor: ObservableObject {
         let unescaped = unescapeString(inputText)
         DispatchQueue.main.async {
             self.inputText = unescaped
+        }
+    }
+    
+    // AI修复JSON功能
+    func healJSONWithAI() {
+        guard openRouterManager.isConfigured else {
+            DispatchQueue.main.async {
+                self.validationError = JSONValidationError.invalidJSON(
+                    message: "OpenRouter 未配置。请在设置中配置 API Key 和模型。",
+                    line: nil,
+                    column: nil
+                )
+            }
+            return
+        }
+        
+        DispatchQueue.main.async {
+            self.isHealing = true
+            self.processingStatus = "AI正在修复JSON..."
+            self.processingProgress = 0.1
+        }
+        
+        Task {
+            do {
+                let healedJSON = try await openRouterService.healJSON(inputText, using: openRouterManager)
+                
+                await MainActor.run {
+                    self.inputText = healedJSON
+                    self.isHealing = false
+                    self.processingStatus = ""
+                    self.processingProgress = 0.0
+                    
+                    // 立即尝试验证修复后的JSON
+                    self.processJSON(sortKeys: false)
+                }
+            } catch {
+                await MainActor.run {
+                    self.isHealing = false
+                    self.processingStatus = ""
+                    self.processingProgress = 0.0
+                    self.validationError = JSONValidationError.invalidJSON(
+                        message: "AI修复失败：\(error.localizedDescription)",
+                        line: nil,
+                        column: nil
+                    )
+                }
+            }
         }
     }
     

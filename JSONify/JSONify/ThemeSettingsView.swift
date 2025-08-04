@@ -9,9 +9,11 @@ import SwiftUI
 
 struct ThemeSettingsView: View {
     @ObservedObject var themeManager: ThemeManager
+    @StateObject private var openRouterManager = OpenRouterManager()
     @State private var showingColorPicker = false
     @State private var selectedColorType: ColorType = .stringColor
     @State private var tempColor: Color = .red
+    @State private var showingAPIKeyField = false
     
     enum ColorType: String, CaseIterable {
         case stringColor = "字符串颜色"
@@ -142,11 +144,33 @@ struct ThemeSettingsView: View {
                 
                 Divider()
                 
+                // OpenRouter AI 修复设置
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("AI JSON 修复")
+                        .font(.headline)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("使用 OpenRouter API 自动修复损坏的 JSON")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Toggle("启用 AI 修复", isOn: $openRouterManager.isEnabled)
+                            .toggleStyle(SwitchToggleStyle())
+                        
+                        if openRouterManager.isEnabled {
+                            OpenRouterConfigView(manager: openRouterManager)
+                        }
+                    }
+                }
+                
+                Divider()
+                
                 // 重置按钮
                 HStack {
                     Spacer()
                     Button("重置为默认") {
                         themeManager.resetToDefaults()
+                        openRouterManager.resetSettings()
                     }
                     .buttonStyle(.bordered)
                 }
@@ -409,6 +433,87 @@ struct ColorPickerSheet: View {
     }
 }
 
+
+// OpenRouter配置视图
+struct OpenRouterConfigView: View {
+    @ObservedObject var manager: OpenRouterManager
+    @State private var showingAPIKey = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // API Key 配置
+            VStack(alignment: .leading, spacing: 8) {
+                Text("API Key")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                HStack {
+                    if showingAPIKey {
+                        SecureField("输入 OpenRouter API Key", text: $manager.apiKey)
+                            .textFieldStyle(.roundedBorder)
+                    } else {
+                        HStack {
+                            Text(manager.apiKey.isEmpty ? "未设置" : "••••••••")
+                                .foregroundColor(manager.apiKey.isEmpty ? .secondary : .primary)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(6)
+                    }
+                    
+                    Button(showingAPIKey ? "隐藏" : "编辑") {
+                        showingAPIKey.toggle()
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
+                if manager.apiKey.isEmpty {
+                    Text("请在 OpenRouter.ai 获取 API Key")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
+            }
+            
+            // 模型选择
+            VStack(alignment: .leading, spacing: 8) {
+                Text("AI 模型")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                TextField("输入模型名称", text: $manager.modelName)
+                    .textFieldStyle(.roundedBorder)
+                
+                Text("推荐使用 Claude 或 GPT 模型获得最佳修复效果")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            // 配置状态
+            HStack {
+                Image(systemName: manager.isConfigured ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundColor(manager.isConfigured ? .green : .orange)
+                
+                Text(manager.isConfigured ? "配置完成" : "需要配置 API Key")
+                    .font(.caption)
+                    .foregroundColor(manager.isConfigured ? .green : .orange)
+                
+                Spacer()
+            }
+        }
+        .padding(.leading, 16)
+        .onChange(of: manager.apiKey) { _, _ in
+            manager.saveSettings()
+        }
+        .onChange(of: manager.modelName) { _, _ in
+            manager.saveSettings()
+        }
+        .onChange(of: manager.isEnabled) { _, _ in
+            manager.saveSettings()
+        }
+    }
+}
 
 #Preview {
     ThemeSettingsView(themeManager: ThemeManager())

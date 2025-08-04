@@ -33,7 +33,7 @@ struct MainTabView: View {
             
             NewThemeSettingsView()
                 .tabItem {
-                    Label("主题", systemImage: "paintbrush.fill")
+                    Label("设置", systemImage: "gearshape.fill")
                 }
                 .tag(3)
         }

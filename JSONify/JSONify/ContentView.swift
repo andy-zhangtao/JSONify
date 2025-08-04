@@ -191,8 +191,42 @@ extension ContentView {
     private var inputErrorView: some View {
         Group {
             if let error = jsonProcessor.validationError {
-                InfoBubble(text: error.localizedDescription, type: .error)
-                    .pageTransition(isActive: jsonProcessor.validationError != nil)
+                VStack(spacing: 8) {
+                    InfoBubble(text: error.localizedDescription, type: .error)
+                        .pageTransition(isActive: jsonProcessor.validationError != nil)
+                    
+                    // AI修复按钮
+                    if jsonProcessor.isHealingAvailable && !jsonProcessor.isHealing {
+                        HStack {
+                            Spacer()
+                            
+                            SimpleIconButton(
+                                icon: "brain.head.profile",
+                                tooltip: "使用AI修复JSON",
+                                variant: .success,
+                                size: 14,
+                                action: {
+                                    jsonProcessor.healJSONWithAI()
+                                }
+                            )
+                            .animatedScale(trigger: jsonProcessor.isHealingAvailable)
+                        }
+                        .pageTransition(isActive: jsonProcessor.isHealingAvailable)
+                    } else if jsonProcessor.isHealing {
+                        HStack {
+                            Spacer()
+                            
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                Text("AI修复中...")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
+                            .pageTransition(isActive: jsonProcessor.isHealing)
+                        }
+                    }
+                }
             }
         }
     }

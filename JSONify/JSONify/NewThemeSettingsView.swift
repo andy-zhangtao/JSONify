@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewThemeSettingsView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @StateObject private var openRouterManager = OpenRouterManager()
     @State private var showingColorCustomization = false
     
     var body: some View {
@@ -16,9 +17,9 @@ struct NewThemeSettingsView: View {
             VStack(alignment: .leading, spacing: 24) {
                 // 标题
                 HStack {
-                    Image(systemName: "paintbrush.fill")
+                    Image(systemName: "gearshape.fill")
                         .foregroundColor(.accentColor)
-                    Text("外观与主题")
+                    Text("应用设置")
                         .font(.title2)
                         .fontWeight(.bold)
                 }
@@ -126,6 +127,29 @@ struct NewThemeSettingsView: View {
                                     Spacer()
                                 }
                                 .padding(.top)
+                            }
+                        }
+                    }
+                    .padding()
+                }
+                
+                // OpenRouter AI 修复设置
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Label("AI JSON 修复", systemImage: "brain.head.profile")
+                            .font(.headline)
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("使用 OpenRouter API 自动修复损坏的 JSON")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            
+                            Toggle("启用 AI 修复", isOn: $openRouterManager.isEnabled)
+                                .toggleStyle(SwitchToggleStyle())
+                            
+                            if openRouterManager.isEnabled {
+                                Divider()
+                                OpenRouterConfigSection(manager: openRouterManager)
                             }
                         }
                     }
@@ -324,6 +348,153 @@ extension Color {
     }
 }
 
+
+// OpenRouter 配置组件
+struct OpenRouterConfigSection: View {
+    @ObservedObject var manager: OpenRouterManager
+    @State private var showingAPIKey = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // API Key 配置
+            VStack(alignment: .leading, spacing: 8) {
+                Text("API Key")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                HStack {
+                    if showingAPIKey {
+                        SecureField("输入 OpenRouter API Key", text: $manager.apiKey)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: manager.apiKey) { _, _ in
+                                manager.clearValidation()
+                            }
+                    } else {
+                        HStack {
+                            Text(manager.apiKey.isEmpty ? "未设置" : "••••••••")
+                                .foregroundColor(manager.apiKey.isEmpty ? .secondary : .primary)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(6)
+                    }
+                    
+                    Button(showingAPIKey ? "隐藏" : "编辑") {
+                        showingAPIKey.toggle()
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
+                if manager.apiKey.isEmpty {
+                    Text("请在 OpenRouter.ai 获取 API Key")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
+            }
+            
+            // 模型输入
+            VStack(alignment: .leading, spacing: 8) {
+                Text("AI 模型")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                TextField("输入模型名称", text: $manager.modelName)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.body, design: .monospaced))
+                    .onChange(of: manager.modelName) { _, _ in
+                        manager.clearValidation()
+                    }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("推荐模型示例：")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("• anthropic/claude-3.5-sonnet")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .textSelection(.enabled)
+                    
+                    Text("• openai/gpt-4o")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .textSelection(.enabled)
+                    
+                    Text("• meta-llama/llama-3.1-8b-instruct")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .textSelection(.enabled)
+                    
+                    Text("更多模型请查看 OpenRouter.ai")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                }
+            }
+            
+            // 验证按钮和状态
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Button(action: {
+                        Task {
+                            await manager.validateConfiguration()
+                        }
+                    }) {
+                        HStack {
+                            if manager.isPinging {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "network")
+                            }
+                            Text(manager.isPinging ? "验证中..." : "验证配置")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(!manager.canValidate || manager.isPinging)
+                    
+                    Spacer()
+                }
+                
+                // 验证状态显示
+                if !manager.validationMessage.isEmpty {
+                    HStack {
+                        Image(systemName: manager.isValidated ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .foregroundColor(manager.isValidated ? .green : .red)
+                        
+                        Text(manager.validationMessage)
+                            .font(.caption)
+                            .foregroundColor(manager.isValidated ? .green : .red)
+                        
+                        Spacer()
+                    }
+                } else if manager.canValidate && !manager.isValidated {
+                    HStack {
+                        Image(systemName: "info.circle")
+                            .foregroundColor(.blue)
+                        
+                        Text("点击验证按钮检查配置是否正确")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                        
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .onChange(of: manager.apiKey) { _, _ in
+            manager.saveSettings()
+        }
+        .onChange(of: manager.modelName) { _, _ in
+            manager.saveSettings()
+        }
+        .onChange(of: manager.isEnabled) { _, _ in
+            manager.saveSettings()
+        }
+    }
+}
 
 #Preview {
     NewThemeSettingsView()
