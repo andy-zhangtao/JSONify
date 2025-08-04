@@ -423,6 +423,394 @@ struct InfoBubble: View {
     }
 }
 
+// MARK: - 图标按钮组件（带tooltip）
+struct IconButton: View {
+    let icon: String
+    let tooltip: String
+    let action: () -> Void
+    let variant: EnhancedButtonStyle.ButtonVariant
+    let size: CGFloat
+    
+    @State private var isHovered = false
+    @State private var showTooltip = false
+    @EnvironmentObject private var themeManager: ThemeManager
+    
+    init(
+        icon: String,
+        tooltip: String,
+        variant: EnhancedButtonStyle.ButtonVariant = .primary,
+        size: CGFloat = 16,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.tooltip = tooltip
+        self.action = action
+        self.variant = variant
+        self.size = size
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: size, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: 32, height: 32)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(backgroundColor)
+                        .shadow(
+                            color: shadowColor,
+                            radius: isHovered ? 4 : 2,
+                            x: 0,
+                            y: isHovered ? 2 : 1
+                        )
+                )
+                .scaleEffect(isHovered ? 1.1 : 1.0)
+                .animation(.easeInOut(duration: 0.2), value: isHovered)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(tooltip)
+        .accessibilityHint("")
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isHovered = hovering
+            }
+            if hovering {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    if isHovered {
+                        showTooltip = true
+                    }
+                }
+            } else {
+                showTooltip = false
+            }
+        }
+        .overlay(
+            tooltipView,
+            alignment: .top
+        )
+    }
+    
+    @ViewBuilder
+    private var tooltipView: some View {
+        if showTooltip {
+            Text(tooltip)
+                .font(.caption)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.black.opacity(0.9))
+                        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                )
+                .offset(y: -50)
+                .zIndex(1002)
+                .allowsHitTesting(false)
+        }
+    }
+    
+    private var iconColor: Color {
+        Color(hex: variant.colors.text) ?? .white
+    }
+    
+    private var backgroundColor: Color {
+        Color(hex: variant.colors.background) ?? .blue
+    }
+    
+    private var shadowColor: Color {
+        Color.black.opacity(themeManager.effectiveColorScheme == .dark ? 0.3 : 0.15)
+    }
+}
+
+// MARK: - 紧凑图标按钮组件（用于工具栏）
+struct CompactIconButton: View {
+    let icon: String
+    let tooltip: String
+    let action: () -> Void
+    let variant: EnhancedButtonStyle.ButtonVariant
+    
+    @State private var isHovered = false
+    @State private var showTooltip = false
+    
+    init(
+        icon: String,
+        tooltip: String,
+        variant: EnhancedButtonStyle.ButtonVariant = .secondary,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.tooltip = tooltip
+        self.action = action
+        self.variant = variant
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: 28, height: 28)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(backgroundColor.opacity(isHovered ? 1.0 : 0.8))
+                )
+                .scaleEffect(isHovered ? 1.05 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: isHovered)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(tooltip)
+        .accessibilityHint("")
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovered = hovering
+            }
+            if hovering {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    if isHovered {
+                        showTooltip = true
+                    }
+                }
+            } else {
+                showTooltip = false
+            }
+        }
+        .overlay(
+            tooltipView,
+            alignment: .top
+        )
+    }
+    
+    @ViewBuilder
+    private var tooltipView: some View {
+        if showTooltip {
+            Text(tooltip)
+                .font(.caption2)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.black.opacity(0.9))
+                        .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1)
+                )
+                .offset(y: -40)
+                .zIndex(1002)
+                .allowsHitTesting(false)
+        }
+    }
+    
+    private var iconColor: Color {
+        Color(hex: variant.colors.text) ?? .white
+    }
+    
+    private var backgroundColor: Color {
+        Color(hex: variant.colors.background) ?? .gray
+    }
+}
+
+// MARK: - 简化图标按钮组件（主要使用原生tooltip）
+struct SimpleIconButton: View {
+    let icon: String
+    let tooltip: String
+    let action: () -> Void
+    let variant: EnhancedButtonStyle.ButtonVariant
+    let size: CGFloat
+    
+    @State private var isHovered = false
+    @State private var showTooltip = false
+    @EnvironmentObject private var themeManager: ThemeManager
+    
+    init(
+        icon: String,
+        tooltip: String,
+        variant: EnhancedButtonStyle.ButtonVariant = .primary,
+        size: CGFloat = 16,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.tooltip = tooltip
+        self.action = action
+        self.variant = variant
+        self.size = size
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: size, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: 32, height: 32)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(backgroundColor)
+                        .shadow(
+                            color: shadowColor,
+                            radius: isHovered ? 4 : 2,
+                            x: 0,
+                            y: isHovered ? 2 : 1
+                        )
+                )
+                .scaleEffect(isHovered ? 1.1 : 1.0)
+                .animation(.easeInOut(duration: 0.2), value: isHovered)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(tooltip)
+        .accessibilityHint("")
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isHovered = hovering
+            }
+            if hovering {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if isHovered {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showTooltip = true
+                        }
+                    }
+                }
+            } else {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showTooltip = false
+                }
+            }
+        }
+        .overlay(
+            tooltipView,
+            alignment: .top
+        )
+    }
+    
+    @ViewBuilder
+    private var tooltipView: some View {
+        if showTooltip {
+            Text(tooltip)
+                .font(.caption)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.black.opacity(0.9))
+                        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                )
+                .offset(y: -45)
+                .zIndex(1002)
+                .allowsHitTesting(false)
+        }
+    }
+    
+    private var iconColor: Color {
+        Color(hex: variant.colors.text) ?? .white
+    }
+    
+    private var backgroundColor: Color {
+        Color(hex: variant.colors.background) ?? .blue
+    }
+    
+    private var shadowColor: Color {
+        Color.black.opacity(themeManager.effectiveColorScheme == .dark ? 0.3 : 0.15)
+    }
+}
+
+// MARK: - 简化紧凑图标按钮组件
+struct SimpleCompactIconButton: View {
+    let icon: String
+    let tooltip: String
+    let action: () -> Void
+    let variant: EnhancedButtonStyle.ButtonVariant
+    
+    @State private var isHovered = false
+    @State private var showTooltip = false
+    
+    init(
+        icon: String,
+        tooltip: String,
+        variant: EnhancedButtonStyle.ButtonVariant = .secondary,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.tooltip = tooltip
+        self.action = action
+        self.variant = variant
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: 28, height: 28)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(backgroundColor.opacity(isHovered ? 1.0 : 0.8))
+                )
+                .scaleEffect(isHovered ? 1.05 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: isHovered)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(tooltip)
+        .accessibilityHint("")
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovered = hovering
+            }
+            if hovering {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    if isHovered {
+                        showTooltip = true
+                    }
+                }
+            } else {
+                showTooltip = false
+            }
+        }
+        .overlay(
+            tooltipView,
+            alignment: .top
+        )
+    }
+    
+    @ViewBuilder
+    private var tooltipView: some View {
+        if showTooltip {
+            Text(tooltip)
+                .font(.caption2)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.black.opacity(0.9))
+                        .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1)
+                )
+                .offset(y: -40)
+                .zIndex(1002)
+                .allowsHitTesting(false)
+        }
+    }
+    
+    private var iconColor: Color {
+        Color(hex: variant.colors.text) ?? .white
+    }
+    
+    private var backgroundColor: Color {
+        Color(hex: variant.colors.background) ?? .gray
+    }
+}
+
 // MARK: - 扩展：焦点状态检测
 extension View {
     func onFocusChange(_ action: @escaping (Bool) -> Void) -> some View {
