@@ -294,7 +294,7 @@ class JSONProcessor: ObservableObject {
     private func unescapeString(_ input: String) -> String {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // 尝试使用JSON反序列化来正确处理转义的JSON字符串
+        // 先尝试使用JSON反序列化来正确处理转义的JSON字符串
         if let data = trimmed.data(using: .utf8) {
             do {
                 // 尝试将输入作为JSON字符串解析，使用allowFragments选项
@@ -302,16 +302,57 @@ class JSONProcessor: ObservableObject {
                     return jsonString
                 }
             } catch {
-                // 如果不是JSON字符串，继续尝试其他方法
+                // 如果不是JSON字符串，继续尝试手动转义处理
             }
         }
         
-        // 如果JSON解析失败，返回原始输入（去掉外层引号）
-        if trimmed.hasPrefix("\"") && trimmed.hasSuffix("\"") {
-            return String(trimmed.dropFirst().dropLast())
+        // 手动处理转义字符 - 支持不被引号包围的字符串
+        var result = trimmed
+        
+        // 如果有外层引号，先去掉
+        let shouldRemoveQuotes = result.hasPrefix("\"") && result.hasSuffix("\"") && result.count >= 2
+        if shouldRemoveQuotes {
+            result = String(result.dropFirst().dropLast())
         }
         
-        return trimmed
+        // 处理常见的转义字符
+        result = result
+            .replacingOccurrences(of: "\\n", with: "\n")      // 换行符
+            .replacingOccurrences(of: "\\r", with: "\r")      // 回车符
+            .replacingOccurrences(of: "\\t", with: "\t")      // 制表符
+            .replacingOccurrences(of: "\\b", with: "\u{08}")  // 退格符
+            .replacingOccurrences(of: "\\f", with: "\u{0C}")  // 换页符
+            .replacingOccurrences(of: "\\/", with: "/")       // 正斜杠
+            .replacingOccurrences(of: "\\\"", with: "\"")     // 双引号
+            .replacingOccurrences(of: "\\\\", with: "\\")     // 反斜杠（必须最后处理）
+        
+        // 处理Unicode转义序列 \uXXXX
+        result = processUnicodeEscapes(result)
+        
+        return result
+    }
+    
+    // 处理Unicode转义序列的辅助方法
+    private func processUnicodeEscapes(_ input: String) -> String {
+        return performBatchReplacement(
+            input: input,
+            pattern: #"\\u([0-9a-fA-F]{4})"#,
+            transformer: { match, input in
+                // 提取十六进制值
+                guard let hexRange = Range(match.range(at: 1), in: input) else {
+                    return nil // 保留原文
+                }
+                let hexString = String(input[hexRange])
+                
+                // 转换为Unicode字符
+                guard let unicodeValue = UInt32(hexString, radix: 16),
+                      let scalar = UnicodeScalar(unicodeValue) else {
+                    return nil // 保留原文
+                }
+                
+                return String(Character(scalar))
+            }
+        )
     }
     
     private func convertUnicodeSequences(_ input: String) -> String {
