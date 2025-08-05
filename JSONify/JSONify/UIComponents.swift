@@ -230,27 +230,7 @@ struct EnhancedTextEditor: View {
                     alignment: .topTrailing
                 )
             } else {
-                TextEditor(text: $displayText)
-                    .themeAwareMonospacedFont(size: 14 * themeManager.uiDensity.fontSizeMultiplier)
-                    .padding(12)
-                    .background(Color(hex: themeManager.currentSyntaxColors.backgroundColor) ?? .clear)
-                    .foregroundColor(Color(hex: themeManager.currentSyntaxColors.textColor) ?? .primary)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(borderColor, lineWidth: isFocused ? 2 : 1)
-                            .animation(.easeInOut(duration: 0.2), value: isFocused)
-                    )
-                    .cornerRadius(10)
-                    .onReceive(NotificationCenter.default.publisher(for: NSTextView.didBeginEditingNotification)) { _ in
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            isFocused = true
-                        }
-                    }
-                    .onReceive(NotificationCenter.default.publisher(for: NSTextView.didEndEditingNotification)) { _ in
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            isFocused = false
-                        }
-                    }
+                PlainTextEditor(text: $displayText, isFocused: $isFocused, borderColor: borderColor)
                     .onChange(of: displayText) { _, newValue in
                         // 双向绑定，但避免循环更新
                         if newValue != text {
@@ -829,4 +809,221 @@ private struct FocusDetector: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+// MARK: - 纯文本编辑器（禁用智能替换）
+struct PlainTextEditor: NSViewRepresentable {
+    @Binding var text: String
+    @Binding var isFocused: Bool
+    let borderColor: Color
+    @EnvironmentObject private var themeManager: ThemeManager
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    func makeNSView(context: Context) -> NSView {
+        // 创建容器视图
+        let containerView = NSView()
+        
+        // 创建滚动视图和文本视图
+        let scrollView = NSScrollView()
+        let textView = NSTextView()
+        
+        // 基本配置
+        textView.isEditable = true
+        textView.isSelectable = true
+        textView.isRichText = false
+        textView.allowsUndo = true
+        textView.delegate = context.coordinator
+        
+        // 关键：禁用智能引号和其他自动替换功能
+        textView.isAutomaticQuoteSubstitutionEnabled = false
+        textView.isAutomaticDashSubstitutionEnabled = false
+        textView.isAutomaticTextReplacementEnabled = false
+        textView.isAutomaticSpellingCorrectionEnabled = false
+        textView.isAutomaticDataDetectionEnabled = false
+        textView.isAutomaticLinkDetectionEnabled = false
+        
+        // 文本容器配置 - 关键修复
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
+        textView.textContainer?.lineFragmentPadding = 0
+        
+        // 确保文本容器有正确的宽度
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.containerSize = NSSize(width: 0, height: CGFloat.greatestFiniteMagnitude)
+        
+        // 强制设置文本视图的frame
+        textView.minSize = NSSize(width: 0, height: 0)
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        
+        // 滚动视图配置
+        scrollView.documentView = textView
+        scrollView.hasVerticalScroller = true
+        scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
+        
+        // 设置初始文本
+        textView.string = text
+        
+        // 强制设置一些测试文本来验证显示
+        if text.isEmpty {
+            textView.string = "测试文本 - 如果你看到这个，说明文本显示正常"
+        }
+        
+        print("PlainTextEditor makeNSView - 初始文本: '\(text)'")
+        print("PlainTextEditor makeNSView - textView.string: '\(textView.string)'")
+        print("PlainTextEditor makeNSView - textView bounds: \(textView.bounds)")
+        print("PlainTextEditor makeNSView - scrollView bounds: \(scrollView.bounds)")
+        
+        // 应用主题和样式
+        updateTheme(textView: textView, scrollView: scrollView)
+        
+        // 布局配置 - 关键修复：内置padding和边框
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(scrollView)
+        
+        // 设置容器视图的最小尺寸
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        containerView.setContentHuggingPriority(.defaultLow, for: .vertical)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
+            scrollView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
+            scrollView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
+            scrollView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -12),
+            
+            // 设置最小尺寸约束
+            containerView.widthAnchor.constraint(greaterThanOrEqualToConstant: 100),
+            containerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 50)
+        ])
+        
+        // 设置边框和圆角
+        scrollView.wantsLayer = true
+        scrollView.layer?.cornerRadius = 10
+        scrollView.layer?.borderWidth = isFocused ? 2 : 1
+        scrollView.layer?.borderColor = NSColor.from(borderColor)?.cgColor ?? NSColor.controlAccentColor.cgColor
+        
+        print("PlainTextEditor makeNSView - 初始文本: '\(text)'")
+        print("PlainTextEditor makeNSView - textView.string: '\(textView.string)'")
+        
+        return containerView
+    }
+    
+    func updateNSView(_ nsView: NSView, context: Context) {
+        guard let scrollView = nsView.subviews.first as? NSScrollView,
+              let textView = scrollView.documentView as? NSTextView else { return }
+        
+        // 只在文本真正不同时才更新，避免循环
+        if textView.string != text {
+            print("PlainTextEditor updateNSView - 更新文本: '\(text)'")
+            textView.string = text
+            textView.needsDisplay = true
+        }
+        
+        // 强制更新文本容器尺寸
+        if scrollView.bounds.width > 0 {
+            let containerWidth = scrollView.bounds.width - 24 // 减去padding
+            textView.textContainer?.containerSize = NSSize(width: containerWidth, height: CGFloat.greatestFiniteMagnitude)
+            
+            // 强制textView重新布局
+            textView.frame = NSRect(x: 0, y: 0, width: containerWidth, height: textView.frame.height)
+            textView.sizeToFit()
+            textView.needsLayout = true
+            textView.layoutSubtreeIfNeeded()
+            textView.setNeedsDisplay(textView.bounds)
+        }
+        
+        // 调试尺寸信息
+        print("PlainTextEditor updateNSView - textView bounds: \(textView.bounds)")
+        print("PlainTextEditor updateNSView - scrollView bounds: \(scrollView.bounds)")
+        print("PlainTextEditor updateNSView - containerView bounds: \(nsView.bounds)")
+        print("PlainTextEditor updateNSView - textContainer size: \(textView.textContainer?.containerSize.width ?? -1)")
+        
+        // 更新边框颜色（响应焦点变化）
+        scrollView.layer?.borderWidth = isFocused ? 2 : 1
+        scrollView.layer?.borderColor = NSColor.from(borderColor)?.cgColor ?? NSColor.controlAccentColor.cgColor
+        
+        // 更新主题
+        updateTheme(textView: textView, scrollView: scrollView)
+    }
+    
+    private func updateTheme(textView: NSTextView, scrollView: NSScrollView) {
+        let fontSize = 14 * themeManager.uiDensity.fontSizeMultiplier
+        textView.font = NSFont.monospacedSystemFont(ofSize: fontSize, weight: .regular)
+        
+        // 使用强对比度颜色确保可见性
+        textView.textColor = NSColor.labelColor
+        textView.backgroundColor = NSColor.textBackgroundColor
+        textView.insertionPointColor = NSColor.labelColor
+        
+        // 设置滚动视图背景
+        scrollView.backgroundColor = NSColor.textBackgroundColor
+        
+        // 强制重绘
+        textView.needsDisplay = true
+        scrollView.needsDisplay = true
+    }
+    
+    class Coordinator: NSObject, NSTextViewDelegate {
+        let parent: PlainTextEditor
+        
+        init(_ parent: PlainTextEditor) {
+            self.parent = parent
+        }
+        
+        func textDidChange(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else { return }
+            
+            // 立即更新绑定的文本
+            parent.text = textView.string
+        }
+        
+        func textDidBeginEditing(_ notification: Notification) {
+            parent.isFocused = true
+        }
+        
+        func textDidEndEditing(_ notification: Notification) {
+            parent.isFocused = false
+        }
+    }
+}
+
+// MARK: - NSColor 扩展
+extension NSColor {
+    convenience init?(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            return nil
+        }
+
+        self.init(
+            srgbRed: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255,
+            alpha: Double(a) / 255
+        )
+    }
+    
+    static func from(_ color: Color) -> NSColor? {
+        // 简单的Color到NSColor转换
+        // 这是一个近似转换，对于边框颜色足够使用
+        if #available(macOS 11.0, *) {
+            return NSColor(color)
+        } else {
+            return nil
+        }
+    }
 }
